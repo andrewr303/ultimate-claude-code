@@ -1,0 +1,67 @@
+# DevTools Overrides
+
+### What are DevTools Overrides?
+
+**DevTools Overrides** is a Chrome DevTools feature that lets you replace any resource served by a website — HTML, JavaScript, CSS — with a local version stored on your machine. The substitution happens transparently on every page load, without touching the server or the source code.
+
+You can find it under **Sources → Overrides** in Chrome DevTools.
+
+> **Cannot be automated.** Unlike the snippets in other categories, Overrides require manual setup in Chrome DevTools. They cannot be executed programmatically via automation tools such as Puppeteer, Playwright, or the DevTools Protocol.
+
+---
+
+### Why a dedicated category?
+
+The snippets in this collection run in the browser console *after* the page has loaded. That works for measuring what already happened, but some problems only reveal themselves *during* the page lifecycle — before frameworks bootstrap, before API calls fire, before the first paint.
+
+DevTools Overrides let you inject instrumentation code **before any other script runs**, making it possible to observe things that are invisible to console snippets:
+
+- Every `fetch()` and `XHR` call from the moment the page starts loading
+- Framework initialization sequences
+- Errors thrown during bootstrap that disappear before the console opens
+- Timing of API calls relative to Core Web Vitals like LCP
+
+---
+
+### How to set up an Override
+
+**Step 1 — Enable local overrides**
+
+Open Chrome DevTools → **Sources** → **Overrides** tab → click **Select folder for overrides** and choose a local directory. When prompted, allow DevTools to access it.
+
+**Step 2 — Save the resource you want to modify**
+
+Navigate to the page, open **Sources** → **Page**, find the HTML file or script you want to override, right-click it, and select **Save for overrides**. A purple dot will appear next to the file indicating it is now overridden locally.
+
+**Step 3 — Inject the snippet**
+
+Open the local copy of the file in DevTools and add the inject snippet code inside a `<script>` tag before the closing `</head>`:
+
+```html
+<script>
+  // paste inject snippet here
+</script>
+```
+
+**Step 4 — Reload and read**
+
+Reload the page. The override fires before any other script. Once the page has loaded, run the companion **read snippet** from the console to see the captured data.
+
+---
+
+### Workflow
+
+```
+Setup (once)          Every page load              Console (on demand)
+─────────────         ────────────────             ───────────────────
+Enable Overrides  →   Inject snippet runs  →   Paste read snippet
+Save HTML file        Captures data into         See results correlated
+Add <script> tag      window.__perfCalls         with LCP and other metrics
+```
+
+---
+
+### Further Reading
+
+- [Local Overrides](https://developer.chrome.com/docs/devtools/overrides) | Chrome Developers
+- [Override web content and HTTP response headers](https://developer.chrome.com/docs/devtools/overrides) | Chrome Developers

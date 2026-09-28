@@ -1,0 +1,18 @@
+{
+  "name": "avr-debug",
+  "description": "An all-in-one debugging and code-health suite combining interactive DAP debugging, evidence-based log instrumentation, browser performance tracing, TypeScript diagnostics, Semgrep and OpenRewrite passes, and a full code-quality scanner bench.",
+  "owner": {
+    "name": "Andrew Rodriguez"
+  },
+  "plugins": [
+    {
+      "name": "avr-debug",
+      "source": "./",
+      "version": "1.0.0",
+      "description": "An all-in-one debugging and code-health suite combining interactive DAP debugging, evidence-based log instrumentation, browser performance tracing, TypeScript diagnostics, Semgrep and OpenRewrite passes, and a full code-quality scanner bench.",
+      "author": {
+        "name": "Andrew Rodriguez"
+      }
+    }
+  ]
+}

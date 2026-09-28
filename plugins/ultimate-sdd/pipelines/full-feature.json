@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "full-feature",
+  "description": "Discover, propose, resolve material design decisions, apply with per-task TDD, verify, ordered independent reviews, retain, archive.",
+  "stages": [
+    {"id": "office-hours", "skill": "prd-explore", "role": "planner", "requires": [], "gate": true},
+    {"id": "propose", "skill": "plan-propose", "role": "planner", "requires": ["office-hours"], "gate": true},
+    {"id": "design", "skill": "plan-design", "role": "planner", "requires": ["propose"], "gate": true},
+    {"id": "apply", "skill": "plan-apply", "role": "implementer", "requires": ["design"], "gate": true},
+    {"id": "verify", "skill": "task-verify", "role": "reviewer", "requires": ["apply"]},
+    {"id": "review", "skill": "plan-review", "role": "reviewer", "requires": ["verify"]},
+    {"id": "review-loop", "skill": "plan-review", "role": "fixer", "requires": ["review"], "loop": {"kind": "review-cycle", "maxRounds": 3}},
+    {"id": "retain", "skill": "plan-retain", "role": "reviewer", "requires": ["review-loop"]},
+    {"id": "archive", "skill": "plan-archive", "role": "shipper", "requires": ["retain"]}
+  ]
+}

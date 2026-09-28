@@ -1,0 +1,624 @@
+/*
+ * Component layer: buttons, fields, the review table, pagination, the detail
+ * panel, the form, and the dialog. Every class pairs with markup produced by
+ * src/components/*.tsx.
+ *
+ * Motion contract:
+ *  - Only transform and opacity ever animate (compositor-only).
+ *  - All animation lives inside prefers-reduced-motion: no-preference.
+ *  - Hover rules live inside (hover: hover) so touch never shows stuck
+ *    hover states; [data-force="…"] mirrors those same declarations for the
+ *    state harness's static samples.
+ *  - Color and fill changes are instant by design.
+ */
+
+/* Buttons ------------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-block-size: var(--control-min-h);
+  padding: 0 var(--space-m);
+  border: 1px solid transparent;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-primary);
+  font: 600 var(--fs-300)/1.2 var(--font-sans);
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn:disabled {
+  border-color: var(--line-hairline);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.btn-primary {
+  border-color: var(--accent-solid);
+  background: var(--accent-solid);
+  color: var(--accent-ink);
+}
+
+/* Native-disabled primary (not pending): the fill drops away entirely so the
+   resting state never reads as an available action. Pending (below) keeps
+   the fill; order makes the pending rule win at equal specificity. */
+.btn-primary:disabled {
+  background: transparent;
+}
+
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled),
+  .btn-primary[data-force="hover"] {
+    border-color: var(--accent-strong);
+    background: var(--accent-strong);
+  }
+}
+
+.btn-primary:active,
+.btn-primary[data-force="active"] {
+  border-color: var(--accent-press);
+  background: var(--accent-press);
+  transform: scale(0.96);
+}
+
+.btn-quiet {
+  border-color: var(--line-control);
+  background: transparent;
+}
+
+@media (hover: hover) {
+  .btn-quiet:hover:not(:disabled),
+  .btn-quiet[data-force="hover"] {
+    background: var(--surface-inset);
+  }
+}
+
+.btn-quiet:active,
+.btn-quiet[data-force="active"] {
+  background: var(--surface-inset);
+  border-color: var(--text-secondary);
+  transform: scale(0.96);
+}
+
+/* Pending submit: stays filled and labelled, spins, and blocks input. */
+.btn[data-pending="true"] {
+  border-color: var(--accent-solid);
+  background: var(--accent-solid);
+  color: var(--accent-ink);
+  cursor: default;
+}
+
+.btn-row-toggle {
+  padding-inline: var(--space-s);
+}
+
+.spinner {
+  inline-size: 14px;
+  block-size: 14px;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+}
+
+@keyframes qc-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes qc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .spinner {
+    animation: qc-spin 0.9s linear infinite;
+  }
+
+  /* Interruptible, transform-only press feedback. */
+  .btn {
+    transition: transform 90ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .form-alert,
+  .form-status,
+  .detail-panel {
+    animation: qc-rise 160ms cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+/* Fields ------------------------------------------------------------------- */
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field > label {
+  font: 600 var(--fs-300)/1.4 var(--font-sans);
+}
+
+.field-hint {
+  font: 400 var(--fs-200)/1.4 var(--font-sans);
+  color: var(--text-muted);
+}
+
+.control {
+  inline-size: 100%;
+  min-block-size: var(--control-min-h);
+  padding: 10px 12px;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-s);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font: 400 var(--fs-300)/1.4 var(--font-sans);
+}
+
+textarea.control {
+  min-block-size: 110px;
+  resize: vertical;
+}
+
+@media (max-width: 767px) {
+  /* iOS Safari zooms the page when an input renders below 16px. */
+  .control {
+    font-size: 16px;
+  }
+}
+
+@media (hover: hover) {
+  .control:hover,
+  .control[data-force="hover"] {
+    border-color: var(--text-secondary);
+  }
+}
+
+.control[aria-invalid="true"] {
+  border-color: var(--status-danger);
+  box-shadow: inset 0 0 0 1px var(--status-danger);
+}
+
+.control:disabled {
+  border-color: var(--line-hairline);
+  background: var(--surface-inset);
+  color: var(--text-muted);
+}
+
+.field-error {
+  font: 600 var(--fs-200)/1.4 var(--font-sans);
+  color: var(--status-danger);
+}
+
+/* Queue --------------------------------------------------------------------- */
+
+.queue-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  align-items: end;
+  margin-block-end: var(--space-s);
+}
+
+.field--filter {
+  min-inline-size: 200px;
+  flex: 1 1 220px;
+  max-inline-size: 320px;
+}
+
+.queue-count {
+  margin-inline-start: auto;
+  align-self: center;
+  font: 400 var(--fs-200)/1.4 var(--font-sans);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.queue-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  border-block-start: 2px solid var(--line-strong);
+  font-size: var(--fs-300);
+}
+
+.queue-table caption {
+  caption-side: top;
+  text-align: start;
+  padding-block: 0 var(--space-s);
+  font: italic 400 var(--fs-300)/1.4 var(--font-serif);
+  color: var(--text-secondary);
+}
+
+.queue-table th {
+  padding: 0 var(--space-s);
+  border-block-end: 1px solid var(--line-strong);
+  text-align: start;
+  white-space: nowrap;
+  font: 600 var(--fs-100)/1.2 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: var(--control-min-h);
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.th-sort::after {
+  content: "↕";
+  font-size: var(--fs-100);
+  color: var(--text-muted);
+}
+
+th[aria-sort="ascending"] .th-sort::after {
+  content: "↑";
+  color: var(--accent-solid);
+}
+
+th[aria-sort="descending"] .th-sort::after {
+  content: "↓";
+  color: var(--accent-solid);
+}
+
+@media (hover: hover) {
+  .th-sort:hover,
+  .th-sort[data-force="hover"] {
+    background: var(--surface-inset);
+    color: var(--text-primary);
+  }
+}
+
+.queue-table td {
+  padding: 10px var(--space-s);
+  border-block-end: 1px solid var(--line-hairline);
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+/* Harness-only mirrors; product rows get real :hover inside (hover: hover). */
+tbody tr[data-force="hover"] {
+  background: var(--surface-inset);
+}
+
+@media (hover: hover) {
+  tbody tr:hover {
+    background: var(--surface-inset);
+  }
+}
+
+tr[aria-current="true"] {
+  background: var(--accent-wash);
+}
+
+tr[aria-current="true"] > .cell-id {
+  box-shadow: inset 2px 0 0 0 var(--accent-solid);
+}
+
+.cell-id {
+  font-family: var(--font-mono);
+  font-size: var(--fs-200);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.cell-subject {
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.cell-amount {
+  text-align: end;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-submitted {
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: var(--fs-200);
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-status {
+  white-space: nowrap;
+}
+
+.cell-actions {
+  text-align: end;
+  white-space: nowrap;
+}
+
+.cell-priority[data-priority="urgent"] {
+  color: var(--status-danger);
+  font-weight: 700;
+}
+
+.cell-priority[data-priority="high"] {
+  color: var(--status-warn);
+  font-weight: 600;
+}
+
+.status-dot {
+  display: inline-block;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  margin-inline-end: 6px;
+  vertical-align: middle;
+}
+
+/* Hollow vs filled is the redundant, non-color cue alongside the label. */
+.status-dot[data-status="awaiting"] {
+  border: 1.5px solid var(--text-muted);
+}
+
+.status-dot[data-status="in_review"] {
+  border: 1.5px solid var(--accent-solid);
+  background: var(--accent-solid);
+}
+
+.status-dot[data-status="escalated"] {
+  border: 1.5px solid var(--status-danger);
+  background: var(--status-danger);
+}
+
+.status-dot[data-status="on_hold"] {
+  border: 1.5px solid var(--status-warn);
+  background: var(--status-warn);
+}
+
+/* Below 768px these columns drop out; their values stay available in the
+   detail panel. The remaining columns scroll inside the labelled region. */
+.col-collapsible {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .col-collapsible {
+    display: table-cell;
+  }
+}
+
+.queue-no-results td {
+  padding-block: var(--space-l);
+  text-align: center;
+}
+
+.queue-no-results-title {
+  font: 600 var(--fs-400)/1.4 var(--font-sans);
+}
+
+.queue-no-results-hint {
+  margin-block: 4px var(--space-m);
+  font: 400 var(--fs-200)/1.4 var(--font-sans);
+  color: var(--text-muted);
+}
+
+.queue-empty {
+  display: grid;
+  gap: var(--space-2xs);
+  justify-items: start;
+  padding-block: var(--space-l) var(--space-m);
+  border-block-start: 2px solid var(--line-strong);
+}
+
+.queue-empty-title {
+  font: 600 var(--fs-400)/1.4 var(--font-sans);
+}
+
+.queue-empty-hint {
+  color: var(--text-muted);
+  font-size: var(--fs-300);
+  margin-block-end: var(--space-m);
+}
+
+/* Pagination ----------------------------------------------------------------- */
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-block-start: var(--space-s);
+}
+
+.btn-page {
+  min-inline-size: 44px;
+  padding: 0;
+  border-color: transparent;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) {
+  .btn-page:hover:not(:disabled),
+  .btn-page[data-force="hover"] {
+    background: var(--surface-inset);
+  }
+}
+
+.btn-page[aria-current="page"] {
+  border-block-end: 2px solid var(--accent-solid);
+  color: var(--accent-solid);
+  font-weight: 700;
+}
+
+.page-gap {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--control-min-h);
+  padding-inline: 6px;
+  color: var(--text-muted);
+}
+
+/* Detail panel ---------------------------------------------------------------- */
+
+.detail-panel {
+  margin-block-start: var(--space-m);
+  padding: var(--space-m);
+  background: var(--surface-raised);
+  border: 1px solid var(--line-hairline);
+  border-block-start: 2px solid var(--line-strong);
+  border-radius: var(--radius-m);
+}
+
+.detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-s);
+  margin-block-end: var(--space-m);
+}
+
+.detail-title {
+  font: 600 var(--fs-400)/1.3 var(--font-sans);
+}
+
+.detail-ref {
+  margin-inline-start: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-300);
+  color: var(--accent-solid);
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-m) var(--space-l);
+}
+
+.detail-list > div {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.detail-list dt {
+  font: 600 var(--fs-100)/1.4 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.detail-list dd {
+  font-size: var(--fs-300);
+  line-height: 1.45;
+  overflow-wrap: break-word;
+}
+
+/* Form ------------------------------------------------------------------------- */
+
+.request-form {
+  display: grid;
+  gap: var(--space-m);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-s);
+}
+
+.form-alert,
+.form-status {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-s);
+  background: var(--surface-raised);
+  font-size: var(--fs-300);
+  line-height: 1.45;
+}
+
+.form-alert {
+  border: 1px solid var(--status-danger);
+  border-inline-start: 3px solid var(--status-danger);
+}
+
+.form-status {
+  border: 1px solid var(--status-ok);
+  border-inline-start: 3px solid var(--status-ok);
+}
+
+.mono-ref {
+  font-family: var(--font-mono);
+}
+
+/* Dialog ------------------------------------------------------------------------ */
+
+.qc-dialog {
+  inline-size: min(560px, calc(100% - 24px));
+  max-block-size: calc(100vh - 32px);
+  max-block-size: calc(100dvh - 32px);
+  margin: auto; /* native centering within the top layer */
+  padding: 0;
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-m);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-dialog);
+}
+
+.qc-dialog::backdrop {
+  background: var(--scrim);
+}
+
+.qc-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.qc-dialog-head {
+  padding: var(--space-m) var(--space-l) var(--space-s);
+  border-block-end: 1px solid var(--line-hairline);
+}
+
+.qc-dialog-head h2 {
+  font: 400 var(--fs-500)/1.25 var(--font-serif);
+}
+
+.qc-dialog-sub {
+  margin-block-start: 4px;
+  font: 400 var(--fs-200)/1.4 var(--font-sans);
+  color: var(--text-muted);
+}
+
+.qc-dialog-body {
+  padding: var(--space-m) var(--space-l) var(--space-l);
+  overflow-y: auto;
+  overscroll-behavior: contain; /* background content must not scroll */
+}
+
+@media (max-width: 479px) {
+  .qc-dialog {
+    inline-size: calc(100% - 16px);
+  }
+
+  .qc-dialog-head,
+  .qc-dialog-body {
+    padding-inline: var(--space-m);
+  }
+}

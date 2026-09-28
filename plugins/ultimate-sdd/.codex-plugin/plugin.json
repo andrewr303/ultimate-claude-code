@@ -1,0 +1,55 @@
+{
+  "name": "ultimate-sdd",
+  "version": "1.0.0",
+  "description": "Local-first spec-driven development: PRDs, EPICs, REQs, verifiable TASKs, CHANGE deltas, and delivery pipelines.",
+  "author": {
+    "name": "andrewr303"
+  },
+  "license": "MIT",
+  "keywords": [
+    "prd",
+    "epic",
+    "requirement",
+    "spec",
+    "planning",
+    "readiness",
+    "acceptance-criteria",
+    "agent-handoff",
+    "product-management"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ultimate SDD",
+    "shortDescription": "Local-first spec-driven development for coding agents.",
+    "longDescription": "Local-first spec-driven development: project-owned setup and context, behavior-first PRDs, EPIC/REQ/TASK planning, proportionate technical design, per-task TDD, ordered spec and quality review, evidence freshness gates, CHANGE/truth deltas, checkpoints, and read-only rollback previews. Stdlib Python tools check local state; host support determines independent subagent execution. Explicit resume works without Claude lifecycle hooks.",
+    "developerName": "andrewr303",
+    "category": "Productivity",
+    "capabilities": [
+      "Discovery",
+      "Product briefs",
+      "PRD authoring",
+      "EPIC and REQ planning",
+      "Readiness scoring",
+      "Agent task handoff",
+      "Acceptance verification",
+      "Code-to-requirements analysis",
+      "Adversarial PRD review",
+      "OpenSpec-style change deltas",
+      "Pipeline classify / auto / goal",
+      "Project-owned setup and policy",
+      "Proportionate technical design",
+      "Per-task TDD discipline",
+      "Ordered review and evidence freshness",
+      "Checkpoints and read-only resume",
+      "Conservative rollback previews"
+    ],
+    "defaultPrompt": [
+      "Plan this idea into EPICs and REQs.",
+      "Create a rigorous PRD for this product idea.",
+      "Specify REQ-1 to implementation-ready.",
+      "Load the next task for the coding agent.",
+      "Propose a change that adds a countdown to the launches list."
+    ],
+    "brandColor": "#3dd68c"
+  }
+}

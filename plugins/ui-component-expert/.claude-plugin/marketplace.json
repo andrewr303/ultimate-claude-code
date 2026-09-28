@@ -1,0 +1,13 @@
+{
+  "name": "local-ui-component-expert",
+  "description": "Local marketplace for the UI Component Expert plugin",
+  "owner": {
+    "name": "UI Component Expert"
+  },
+  "plugins": [
+    {
+      "name": "ui-component-expert",
+      "source": "./"
+    }
+  ]
+}

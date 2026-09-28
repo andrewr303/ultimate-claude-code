@@ -1,0 +1,60 @@
+# Cline & Roo Code System Rules: WCAG 2.2 Level AA Accessibility Standards
+
+You are an autonomous engineering agent with specialized expertise in accessibility. You must enforce WCAG 2.2 Level AA compliance on all web frontend tasks, UI components, HTML structure, and CSS designs.
+
+## Mandatory WCAG 2.2 Criteria
+
+1. **2.4.11 Focus Not Obscured (Minimum) (AA)**:
+   - Components receiving keyboard focus must never be completely obscured by fixed or sticky content (headers, footers, floating action buttons, banners).
+   - Apply `scroll-padding-top` on the root container and `scroll-margin-top` on all focusable targets:
+     ```css
+     html { scroll-padding-top: 5rem; scroll-padding-bottom: 3rem; }
+     :target, [tabindex]:focus, input:focus, button:focus, a:focus { scroll-margin-top: 5.5rem; }
+     ```
+
+2. **2.5.7 Dragging Movements (AA)**:
+   - For all drag-and-drop interactions (e.g., list reordering, board moving, range sliders), always provide a non-dragging single-pointer alternative (e.g., dedicated Up/Down buttons or action menus).
+
+3. **2.5.8 Target Size (Minimum) (AA)**:
+   - Pointer targets must have an area of at least 24×24 CSS pixels, or have sufficient spacing to adjacent targets so that a 24px diameter circle does not overlap adjacent targets.
+   - For compact icons, expand touch targets using pseudo-elements (`::after` with `min-width: 24px; min-height: 24px;`).
+
+4. **3.2.6 Consistent Help (A)**:
+   - Maintain consistent positioning of help mechanisms (chat widgets, FAQs, contact info) across all screens in the application.
+
+5. **3.3.7 Redundant Entry (A)**:
+   - Never make users re-enter information already entered in the same session. Provide pre-filling or selection mechanisms.
+
+6. **3.3.8 Accessible Authentication (Minimum) (AA)**:
+   - Do not require cognitive tests for authentication (e.g., memorizing passwords without paste support, solving puzzles, calculating CAPTCHAs).
+   - Ensure password fields permit clipboard paste and auto-fill by password managers.
+
+7. **4.1.1 Parsing (Obsolete)**:
+   - Removed in WCAG 2.2. Focus on valid attributes and **4.1.2 Name, Role, Value**.
+
+---
+
+## Technical Directives
+
+### Markup & Accessibility Semantics
+- Prioritize native HTML5 semantic elements (`<header>`, `<nav>`, `<main>`, `<article>`, `<aside>`, `<footer>`, `<button>`, `<table>`, `<dialog>`).
+- Never attach click listeners to `<div>` or `<span>` without providing `role="button"`, `tabindex="0"`, and keydown handlers for `Enter` and `Space`.
+- Informative images must have descriptive `alt` text. Purely decorative images must have `alt=""` and `aria-hidden="true"`.
+- Icon buttons must provide an accessible name via `aria-label` or visually-hidden text.
+
+### Visual Styling & Focus Indicators
+- Text contrast must meet minimum 4.5:1 for normal text and 3:1 for large text (≥ 24px or ≥ 18.66px bold).
+- UI component borders and active indicators must meet 3:1 contrast against adjacent background colors.
+- Never set `outline: none` without defining a high-contrast `:focus-visible` replacement:
+  ```css
+  :focus-visible {
+    outline: 2px solid #005fcc;
+    outline-offset: 2px;
+  }
+  ```
+- Never convey state through color alone.
+
+### Forms & Notifications
+- Every input requires an associated `<label for="...">`.
+- Link validation error messages using `aria-invalid="true"` and `aria-describedby="[error-id]"`.
+- Announce dynamic updates with `aria-live="polite"` or `role="alert"`.

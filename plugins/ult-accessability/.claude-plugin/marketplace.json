@@ -1,0 +1,16 @@
+{
+  "name": "ult-accessability",
+  "owner": {
+    "name": "Ult Accessability"
+  },
+  "metadata": {
+    "description": "Ultimate web accessibility plugin for Claude Code, Codex, and Kimi Code."
+  },
+  "plugins": [
+    {
+      "name": "ult-accessability",
+      "source": "./",
+      "description": "WCAG 2.2 AA/AAA audits, contrast and color, remediation, testing, and before/after reports. Default skill ult-accessability routes the agent."
+    }
+  ]
+}

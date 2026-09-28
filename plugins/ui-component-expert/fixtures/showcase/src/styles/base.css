@@ -1,0 +1,100 @@
+/* Reset-lite, element defaults, and the global focus ring. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+img,
+svg {
+  display: block;
+  max-inline-size: 100%;
+}
+
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font: 400 var(--fs-400)/1.5 var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+  line-height: 1.15;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--accent-solid);
+}
+
+::selection {
+  background: var(--accent-wash);
+}
+
+/*
+ * One visible focus ring for every focusable element. :focus-visible keeps
+ * the ring on the keyboard path without painting it for every pointer click.
+ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/*
+ * State-harness mirror of the rule above: the same declarations, shown
+ * statically. Harness-only attribute; never set by product code.
+ */
+[data-force="focus"] {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  .btn {
+    border: 1px solid ButtonText;
+  }
+
+  .btn:disabled {
+    border-color: GrayText;
+    color: GrayText;
+  }
+
+  .qc-dialog {
+    border: 1px solid ButtonText;
+  }
+
+  .status-dot {
+    forced-color-adjust: none;
+  }
+}

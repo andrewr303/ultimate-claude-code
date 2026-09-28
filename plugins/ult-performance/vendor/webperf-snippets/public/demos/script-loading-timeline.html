@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How scripts affect HTML parsing</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --c-js: #58a6ff;    --c-js-fg: #79b8ff;
+  --c-raf: #d2a8ff;   --c-raf-fg: #d2a8ff;
+  --c-dirty: #e3b341; --c-dirty-fg: #e3b341;
+  --c-fsl: #f85149;   --c-fsl-fg: #ff7b72;
+  --c-ok: #3fb950;    --c-ok-fg: #3fb950;
+  --c-paint: #39d353; --c-paint-fg: #56d364;
+  --tab-active-bg: #1c2a3f;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --surface2: #eaeef2;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --muted: #656d76;
+  --c-js: #0969da;    --c-js-fg: #0969da;
+  --c-raf: #8250df;   --c-raf-fg: #8250df;
+  --c-dirty: #9a6700; --c-dirty-fg: #9a6700;
+  --c-fsl: #cf222e;   --c-fsl-fg: #cf222e;
+  --c-ok: #1a7f37;    --c-ok-fg: #1a7f37;
+  --c-paint: #1a7f37; --c-paint-fg: #1a7f37;
+  --tab-active-bg: #dbeafe;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Lane legend ───────────────────────────── */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+.legend-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+.lg {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.lg--parse { background: rgba(88,166,255,.12); border: 1px solid var(--c-js); color: var(--c-js-fg); }
+.lg--net   { background: rgba(210,168,255,.12); border: 1px solid var(--c-raf); color: var(--c-raf-fg); }
+.lg--exec  { background: rgba(227,179,65,.12); border: 1px solid var(--c-dirty); color: var(--c-dirty-fg); }
+.lg--block { background: rgba(248,81,73,.12); border: 1px solid var(--c-fsl); color: var(--c-fsl-fg); }
+
+/* ── Tabs ──────────────────────────────────── */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  transition: border-color .15s, color .15s, background .15s;
+  line-height: 1.2;
+}
+.tab:hover { color: var(--text); border-color: var(--c-js); }
+.tab.active { color: var(--text); background: var(--tab-active-bg); border-color: var(--c-js); }
+
+/* ── Frames ────────────────────────────────── */
+.frames { display: flex; flex-direction: column; gap: 10px; }
+.frame { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.frame-label {
+  padding: 5px 12px;
+  background: var(--surface2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.frame-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* ── Pipeline row ──────────────────────────── */
+.row { display: flex; align-items: flex-start; gap: 6px; }
+.row-label {
+  width: 74px;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding-top: 6px;
+  text-align: right;
+}
+.row-items { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+
+/* ── Step boxes ────────────────────────────── */
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: .15;
+  transition: opacity .35s ease, transform .25s ease;
+}
+.step.shown { opacity: 1; }
+.step.active { transform: scale(1.06); }
+
+.step-box {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
+}
+.step-note { font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+/* type colors */
+.t-parse .step-box { background: rgba(88,166,255,.12); border-color: var(--c-js); color: var(--c-js-fg); }
+.t-block .step-box { background: rgba(248,81,73,.15); border-color: var(--c-fsl); color: var(--c-fsl-fg); }
+.t-net   .step-box { background: rgba(210,168,255,.12); border-color: var(--c-raf); color: var(--c-raf-fg); }
+.t-exec  .step-box { background: rgba(227,179,65,.12); border-color: var(--c-dirty); color: var(--c-dirty-fg); }
+.t-ok    .step-box { background: rgba(63,185,80,.12); border-color: var(--c-ok); color: var(--c-ok-fg); }
+.t-done  .step-box { background: rgba(57,211,83,.1); border-color: var(--c-paint); color: var(--c-paint-fg); }
+
+.sep { color: var(--muted); font-size: 14px; margin-top: 4px; opacity: .5; }
+
+/* ── Badge ─────────────────────────────────── */
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: .15;
+  transition: opacity .35s ease;
+  margin-top: 1px;
+}
+.badge.shown { opacity: 1; }
+.badge-block { background: rgba(248,81,73,.2); color: var(--c-fsl-fg); border: 1px solid var(--c-fsl); }
+.badge-ok    { background: rgba(63,185,80,.2); color: var(--c-ok); border: 1px solid var(--c-ok); }
+
+/* ── Controls ──────────────────────────────── */
+.controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn:disabled { opacity: .4; cursor: default; }
+.btn-reset { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-next  { background: #1f6feb; color: #fff; }
+.btn-next:not(:disabled):hover { background: #388bfd; }
+.counter { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+/* ── Explanation ───────────────────────────── */
+.expl {
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--muted);
+  min-height: 58px;
+  transition: border-color .3s;
+}
+.expl strong { color: var(--text); }
+.expl code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px; background: var(--surface2); padding: 1px 4px; border-radius: 3px; color: var(--c-raf); }
+.expl.t-block { border-left-color: var(--c-fsl); }
+.expl.t-ok  { border-left-color: var(--c-ok); }
+.expl.t-neutral { border-left-color: var(--c-js); }
+
+.b-block { display: inline-block; background: rgba(248,81,73,.18); color: var(--c-fsl-fg); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; vertical-align: middle; }
+.b-ok  { display: inline-block; background: rgba(63,185,80,.18); color: var(--c-ok); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- Lane legend -->
+<div class="legend">
+  <span class="legend-label">Lanes</span>
+  <span class="lg lg--parse">HTML parser</span>
+  <span class="lg lg--net">Download</span>
+  <span class="lg lg--exec">Execute</span>
+  <span class="lg lg--block">Parsing blocked</span>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" data-s="0">&lt;script&gt;</button>
+  <button class="tab" data-s="1">&lt;script async&gt;</button>
+  <button class="tab" data-s="2">&lt;script defer&gt;</button>
+</div>
+
+<!-- Visualization -->
+<div id="viz" class="frames"></div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="btn btn-reset" id="btnReset">↩ Reset</button>
+  <button class="btn btn-next" id="btnNext">Next step →</button>
+  <span class="counter" id="counter"></span>
+</div>
+
+<!-- Explanation -->
+<div class="expl t-neutral" id="expl">
+  Click <strong>Next step</strong> to walk through how the browser handles the script.
+</div>
+
+<script>
+// ─── Scenario data ────────────────────────────────────────────────────────────
+const S = [
+  // ─── Scenario 0: Normal <script> (blocking) ────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Document load',
+        rows: [
+          { label: 'Parser', items: [
+            { id: 'n-head', type: 'parse', text: 'parse &lt;head&gt;' },
+            { id: 'n-hit', type: 'parse', text: 'reach &lt;script&gt;', note: 'no async / defer' },
+          ]},
+          { label: 'Blocked', items: [
+            { id: 'n-pause', type: 'block', text: '⏸ parsing paused', note: 'parser stops' },
+            { id: 'n-download', type: 'net', text: '⬇ download script.js', note: 'nothing else renders' },
+            { id: 'n-exec', type: 'exec', text: '▶ execute script.js', note: 'main thread' },
+          ]},
+          { label: 'Parser', items: [
+            { id: 'n-resume', type: 'ok', text: '▶ resume parsing', note: 'parse &lt;body&gt;' },
+            { id: 'n-dcl', type: 'done', text: 'DOMContentLoaded' },
+            { id: 'n-badge', type: 'badge-block', text: 'Blocks parsing ⚠️' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['n-head'], cls: 't-neutral', expl: 'The <strong>HTML parser</strong> reads the document from top to bottom, building the DOM as it goes.' },
+      { ids: ['n-hit'], cls: 't-neutral', expl: 'It reaches a plain <code>&lt;script src&gt;</code> with <strong>no <code>async</code> or <code>defer</code></strong> attribute.' },
+      { ids: ['n-pause'], cls: 't-block', expl: '<span class="b-block">BLOCK</span> The parser <strong>pauses</strong>. No more HTML is parsed and nothing below the script renders until the script is fetched and run.' },
+      { ids: ['n-download'], cls: 't-block', expl: 'The browser <strong>downloads</strong> the script over the network. On a slow connection this alone can add hundreds of milliseconds, all while parsing is frozen.' },
+      { ids: ['n-exec'], cls: 't-block', expl: 'The script <strong>executes</strong> on the main thread. Parsing is still paused, and any layout below is still blocked.' },
+      { ids: ['n-resume'], cls: 't-ok', expl: 'Only now does the parser <strong>resume</strong> and continue with the rest of the document.' },
+      { ids: ['n-dcl', 'n-badge'], cls: 't-block', expl: '<span class="b-block">Result</span> Parsing finishes and <code>DOMContentLoaded</code> fires. A single blocking script in <code>&lt;head&gt;</code> delayed everything after it, hurting FCP and LCP. Reserve this only for critical scripts that must run before content.' },
+    ]
+  },
+
+  // ─── Scenario 1: <script async> ─────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Document load',
+        rows: [
+          { label: 'Parser', items: [
+            { id: 'a-head', type: 'parse', text: 'parse <head>' },
+            { id: 'a-hit', type: 'parse', text: 'reach &lt;script async&gt;', note: '✅ keep going' },
+          ]},
+          { label: 'Parallel', items: [
+            { id: 'a-parse', type: 'ok', text: '▶ keep parsing', note: 'not blocked' },
+            { id: 'a-download', type: 'net', text: '⬇ download', note: 'in background' },
+          ]},
+          { label: 'Execute', items: [
+            { id: 'a-ready', type: 'exec', text: '⏸ brief pause', note: 'download ready' },
+            { id: 'a-exec', type: 'exec', text: '▶ execute ASAP', note: 'order NOT guaranteed' },
+          ]},
+          { label: 'Parser', items: [
+            { id: 'a-dcl', type: 'done', text: 'DOMContentLoaded', note: 'does not wait for async' },
+            { id: 'a-badge', type: 'badge-ok', text: 'Runs ASAP ⚡' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['a-head'], cls: 't-neutral', expl: 'The parser starts reading the document, same as before.' },
+      { ids: ['a-hit'], cls: 't-neutral', expl: 'It reaches a <code>&lt;script async&gt;</code>. The <code>async</code> attribute tells the browser it may fetch the script <strong>without stopping parsing</strong>.' },
+      { ids: ['a-parse'], cls: 't-ok', expl: '<span class="b-ok">✓</span> The parser <strong>keeps going</strong>. HTML below the script continues to parse and render normally.' },
+      { ids: ['a-download'], cls: 't-ok', expl: 'Meanwhile the script <strong>downloads in parallel</strong>, in the background, off the main thread.' },
+      { ids: ['a-ready'], cls: 't-block', expl: 'As soon as the download <strong>finishes</strong>, the browser interrupts parsing to run the script. This pause can land at any point, even mid-parse.' },
+      { ids: ['a-exec'], cls: 't-block', expl: 'The script <strong>executes as soon as it arrives</strong>. With several <code>async</code> scripts, whichever downloads first runs first, so <strong>execution order is not guaranteed</strong>.' },
+      { ids: ['a-dcl', 'a-badge'], cls: 't-ok', expl: '<span class="b-ok">Result</span> <code>async</code> is ideal for <strong>independent scripts</strong> (analytics, ads) that do not depend on the DOM or on each other. It does not delay parsing, but its timing and order are unpredictable.' },
+    ]
+  },
+
+  // ─── Scenario 2: <script defer> ─────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Document load',
+        rows: [
+          { label: 'Parser', items: [
+            { id: 'd-head', type: 'parse', text: 'parse <head>' },
+            { id: 'd-hit', type: 'parse', text: 'reach &lt;script defer&gt;', note: '✅ keep going' },
+          ]},
+          { label: 'Parallel', items: [
+            { id: 'd-parse', type: 'ok', text: '▶ parse whole document', note: 'never blocks' },
+            { id: 'd-download', type: 'net', text: '⬇ download', note: 'in background' },
+          ]},
+          { label: 'After parse', items: [
+            { id: 'd-finish', type: 'ok', text: '✓ parsing complete' },
+            { id: 'd-exec', type: 'exec', text: '▶ execute (in order)', note: 'defer scripts, in sequence' },
+          ]},
+          { label: 'Done', items: [
+            { id: 'd-dcl', type: 'done', text: 'DOMContentLoaded', note: 'waits for defer' },
+            { id: 'd-badge', type: 'badge-ok', text: 'After parse, in order ✓' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['d-head'], cls: 't-neutral', expl: 'The parser starts reading the document.' },
+      { ids: ['d-hit'], cls: 't-neutral', expl: 'It reaches a <code>&lt;script defer&gt;</code>. Like <code>async</code>, <code>defer</code> lets the parser continue instead of blocking.' },
+      { ids: ['d-parse'], cls: 't-ok', expl: '<span class="b-ok">✓</span> The parser continues and parses the <strong>entire document</strong> without ever stopping for the script.' },
+      { ids: ['d-download'], cls: 't-ok', expl: 'The script <strong>downloads in parallel</strong> in the background while parsing proceeds.' },
+      { ids: ['d-finish'], cls: 't-ok', expl: 'The parser <strong>finishes the whole document first</strong>. Unlike <code>async</code>, a deferred script never interrupts parsing to run early.' },
+      { ids: ['d-exec'], cls: 't-ok', expl: 'Only after parsing completes do deferred scripts <strong>execute in document order</strong>. Order is <strong>guaranteed</strong>, so scripts that depend on each other stay safe.' },
+      { ids: ['d-dcl', 'd-badge'], cls: 't-ok', expl: '<span class="b-ok">Result</span> Deferred scripts run just before <code>DOMContentLoaded</code>. <strong>This is the best default</strong> for most scripts: no parser blocking, DOM is ready, and execution order is preserved.' },
+    ]
+  }
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let sIdx = 0;
+let stepIdx = 0;
+let revealed = new Set();
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  const sc = S[sIdx];
+  const viz = document.getElementById('viz');
+
+  viz.innerHTML = sc.frames.map(frame => `
+    <div class="frame">
+      <div class="frame-label">${frame.label}</div>
+      <div class="frame-body">
+        ${frame.rows.map(row => `
+          <div class="row">
+            <span class="row-label">${row.label}</span>
+            <div class="row-items">
+              ${row.items.map((item, i) => {
+                const sep = i < row.items.length - 1 ? '<span class="sep">→</span>' : '';
+                if (item.type.startsWith('badge-')) {
+                  return `<span class="badge ${item.type}" id="${item.id}">${item.text}</span>${sep}`;
+                }
+                return `
+                  <div class="step t-${item.type}" id="${item.id}">
+                    <span class="step-box">${item.text}</span>
+                    ${item.note ? `<span class="step-note">${item.note}</span>` : ''}
+                  </div>${sep}
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  updateState();
+}
+
+function updateState() {
+  const sc = S[sIdx];
+
+  sc.frames.forEach(frame => {
+    frame.rows.forEach(row => {
+      row.items.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (!el) return;
+        el.classList.toggle('shown', revealed.has(item.id));
+        el.classList.toggle('active', false);
+      });
+    });
+  });
+
+  if (stepIdx > 0) {
+    const cur = sc.steps[stepIdx - 1];
+    cur.ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    });
+  }
+
+  const expl = document.getElementById('expl');
+  if (stepIdx === 0) {
+    expl.innerHTML = 'Click <strong>Next step</strong> to walk through how the browser handles the script.';
+    expl.className = 'expl t-neutral';
+  } else {
+    const cur = sc.steps[stepIdx - 1];
+    expl.innerHTML = cur.expl;
+    expl.className = `expl ${cur.cls}`;
+  }
+
+  const total = sc.steps.length;
+  document.getElementById('counter').textContent = `Step ${stepIdx} / ${total}`;
+  document.getElementById('btnNext').disabled = stepIdx >= total;
+}
+
+function nextStep() {
+  const sc = S[sIdx];
+  if (stepIdx >= sc.steps.length) return;
+  const cur = sc.steps[stepIdx];
+  cur.ids.forEach(id => revealed.add(id));
+  stepIdx++;
+  updateState();
+}
+
+function reset() {
+  stepIdx = 0;
+  revealed.clear();
+  render();
+}
+
+function setScenario(i) {
+  sIdx = i;
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j));
+  reset();
+}
+
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => setScenario(+t.dataset.s));
+});
+document.getElementById('btnNext').addEventListener('click', nextStep);
+document.getElementById('btnReset').addEventListener('click', reset);
+
+render();
+
+// ─── Theme ───────────────────────────────────────────────────────────────────
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t || 'dark');
+}
+(function initTheme() {
+  const stored = localStorage.getItem('theme');
+  if (stored) { applyTheme(stored); return; }
+  applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+})();
+window.addEventListener('storage', e => { if (e.key === 'theme') applyTheme(e.newValue); });
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+});
+
+// ─── Height notification ───────────────────────────────────────────────────────
+function notifyHeight() {
+  window.parent.postMessage({ demoHeight: document.body.offsetHeight }, '*');
+}
+new ResizeObserver(notifyHeight).observe(document.body);
+</script>
+</body>
+</html>

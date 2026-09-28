@@ -1,0 +1,16 @@
+{
+  "name": "ult-engineer",
+  "owner": {
+    "name": "Andrew Rodriguez"
+  },
+  "metadata": {
+    "description": "Ultimate TypeScript, React, and Node.js engineering plugin for Claude Code, Codex, and Kimi Code."
+  },
+  "plugins": [
+    {
+      "name": "ult-engineer",
+      "source": "./",
+      "description": "Write, debug, refactor, review, and health-audit TypeScript / React / Node.js. Default skill ult-engineer routes the agent."
+    }
+  ]
+}

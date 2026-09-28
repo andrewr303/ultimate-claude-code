@@ -1,0 +1,167 @@
+---
+type: guide
+---
+
+# WebPerf Snippets CLI
+
+Run curated WebPerf Snippets headlessly via Playwright. Diagnose Core Web Vitals beyond what Lighthouse exposes and gate CI on real performance budgets.
+
+<picture style={{ marginTop: "20px", display: "block" }}>
+  <img
+    width="1200"
+    height="749"
+    sizes="85vw"
+    srcSet="https://res.cloudinary.com/nucliweb/image/upload/c_scale,f_auto,q_auto,w_600/v1777928598/webperf-snippets/webperf-snippets-CLI.png 600w,
+            https://res.cloudinary.com/nucliweb/image/upload/c_scale,f_auto,q_auto,w_1200/v1777928598/webperf-snippets/webperf-snippets-CLI.png 1200w"
+    src="https://res.cloudinary.com/nucliweb/image/upload/c_scale,f_auto,q_auto,w_342/v1777928598/webperf-snippets/webperf-snippets-CLI.png"
+    loading="eager"
+    decoding="sync"
+    fetchpriority="high"
+    alt="WebPerf Snippets CLI"
+  />
+</picture>
+
+## Why
+
+Lighthouse gives you a score. The DevTools snippets give you the _diagnosis_, TTFB / Resource Load Delay / Element Render Delay sub-parts, LoAF script attribution, render-blocking resources, and more. The CLI runs the same curated snippets in a headless browser so you can:
+
+- Diagnose LCP regressions in CI without copy-pasting into DevTools.
+- Gate pull requests on real performance budgets.
+- Automate the snippets you already run by hand.
+
+## Install
+
+Playwright is a peer dependency. Install both, then download the Chromium browser:
+
+```bash copy
+npm install --save-dev webperf-snippets playwright
+npx playwright install chromium
+```
+
+## Usage
+
+```bash copy
+npx webperf-snippets <url> [options]
+```
+
+### Examples
+
+Run the default Core Web Vitals workflow (LCP + CLS, plus LCP-Subparts when LCP exceeds 2.5s):
+
+```bash copy
+npx webperf-snippets https://web.dev
+```
+
+JSON output (for piping into `jq` or CI scripts):
+
+```bash copy
+npx webperf-snippets https://web.dev --json
+```
+
+Run a single snippet by alias:
+
+```bash copy
+npx webperf-snippets https://web.dev --snippet LCP-Subparts
+npx webperf-snippets https://web.dev --snippet render-blocking
+npx webperf-snippets https://web.dev --snippet fonts
+```
+
+### Snippet aliases
+
+| Alias              | Snippet                                          | Category        |
+| ------------------ | ------------------------------------------------ | --------------- |
+| `LCP`              | Largest Contentful Paint                         | Core Web Vitals |
+| `CLS`              | Cumulative Layout Shift                          | Core Web Vitals |
+| `LCP-Subparts`     | LCP Subparts breakdown                           | Core Web Vitals |
+| `fonts`            | Fonts Preloaded, Loaded, and Used Above The Fold | Loading         |
+| `render-blocking`  | Find render-blocking resources                   | Loading         |
+| `resource-hints`   | Resource Hints Validation                        | Loading         |
+| `preload-scripts`  | Validate Preload / Async / Defer Scripts         | Loading         |
+| `priority-hints`   | Priority Hints Audit                             | Loading         |
+| `critical-css`     | Critical CSS Detection                           | Loading         |
+| `ttfb`             | TTFB Sub-Parts                                   | Loading         |
+| `script-parties`   | First and Third-Party Script Info                | Loading         |
+| `script-loading`   | Script Loading                                   | Loading         |
+| `lazy-atf`         | Above-the-fold lazy-loaded images                | Loading         |
+| `lazy-conflict`    | Images with `lazy` + `fetchpriority` conflict    | Loading         |
+| `eager-below-fold` | Non-lazy images outside viewport                 | Loading         |
+
+Gate CI on performance budgets:
+
+```bash copy
+npx webperf-snippets https://web.dev --budget-lcp 2500 --budget-cls 0.1
+```
+
+Run the structural audit workflow:
+
+```bash copy
+npx webperf-snippets https://web.dev --workflow audit
+```
+
+Simulate a mobile viewport (default) or switch to desktop:
+
+```bash copy
+npx webperf-snippets https://web.dev --viewport mobile
+npx webperf-snippets https://web.dev --viewport desktop
+```
+
+Show all items, including passing checks:
+
+```bash copy
+npx webperf-snippets https://web.dev --verbose
+```
+
+### Options
+
+| Option                 | Description                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------- |
+| `--workflow <name>`    | Workflow to run. Default: `core-web-vitals`. Options: `core-web-vitals`, `audit`. |
+| `--snippet <name>`     | Run a single snippet by alias or `Category/Name` path.                            |
+| `--json`               | Output JSON instead of formatted text.                                            |
+| `--viewport <preset>`  | Viewport preset. Default: `mobile`. Options: `mobile`, `tablet`, `desktop`.       |
+| `--wait <ms>`          | Post-load wait before evaluating snippets. Default: `3000`.                       |
+| `--budget-lcp <ms>`    | Exit `1` if LCP exceeds this value.                                               |
+| `--budget-cls <score>` | Exit `1` if CLS exceeds this value.                                               |
+| `--verbose`            | Show all items, including passing checks.                                         |
+| `--headed`             | Show the browser window (debug).                                                  |
+| `-h, --help`           | Show help.                                                                        |
+
+### Exit codes
+
+| Code | Meaning                                      |
+| ---- | -------------------------------------------- |
+| `0`  | All checks passed.                           |
+| `1`  | Budget violation, or a snippet errored.      |
+| `2`  | Usage error (missing URL, unknown workflow). |
+
+## CI Integration
+
+GitHub Actions example, fail the PR if LCP exceeds 2.5s:
+
+```yaml copy
+- run: |
+    npm install --no-save webperf-snippets playwright
+    npx playwright install --with-deps chromium
+    npx webperf-snippets https://staging.web.dev --budget-lcp 2500 --budget-cls 0.1
+```
+
+## How it works
+
+1. Launches headless Chromium via Playwright.
+2. Pre-registers `PerformanceObserver`s for LCP and layout-shift before navigation.
+3. Navigates and waits for the page to settle.
+4. Evaluates each snippet's IIFE in the page context, capturing the returned object.
+5. Applies the workflow's decision tree to enqueue follow-up snippets.
+6. Renders results (human-readable or JSON) and exits with the appropriate code.
+
+## Known limitations
+
+- **No INP**: INP requires real user interactions. Synthetic interaction support is planned.
+- **CLS in headless is conservative**: layout shifts that only happen on scroll are missed unless you script the scroll.
+- **First navigation only**: each invocation runs one URL. SPAs need the post-route URL passed directly.
+- **Decision-tree follow-ups re-navigate**: when a follow-up snippet fires (e.g. LCP-Subparts), the page reloads. A shared page session is planned.
+
+## Further reading
+
+- [GitHub Repository](https://github.com/nucliweb/webperf-snippets), source code and issue tracker
+- [npm package](https://www.npmjs.com/package/webperf-snippets), changelog and releases

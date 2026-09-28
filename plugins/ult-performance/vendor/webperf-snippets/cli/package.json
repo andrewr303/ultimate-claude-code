@@ -1,0 +1,54 @@
+{
+  "name": "webperf-snippets",
+  "version": "0.2.0",
+  "description": "Run curated WebPerf Snippets headlessly via Playwright. Diagnose Core Web Vitals beyond what Lighthouse exposes.",
+  "type": "module",
+  "bin": "./src/bin.js",
+  "files": [
+    "src",
+    "snippets",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:e2e": "vitest run tests/e2e"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "keywords": [
+    "webperf",
+    "performance",
+    "core-web-vitals",
+    "lcp",
+    "cls",
+    "inp",
+    "playwright",
+    "cli",
+    "ci"
+  ],
+  "author": "Joan Leon | @nucliweb",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nucliweb/webperf-snippets.git",
+    "directory": "cli"
+  },
+  "homepage": "https://webperf-snippets.nucliweb.net",
+  "peerDependencies": {
+    "playwright": ">=1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "playwright": {
+      "optional": false
+    }
+  }
+}

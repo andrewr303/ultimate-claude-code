@@ -1,0 +1,19 @@
+{
+  "name": "ui-component-expert",
+  "version": "0.1.0",
+  "description": "Bespoke UI component and interface generator for Claude Code. Assisted workflow translating manual Claude Design exports into typed DesignContracts, unstyled headless primitives (Base UI, React Aria, Zag.js), and custom TypeScript components with unverified browser status.",
+  "keywords": [
+    "ui-component-expert",
+    "claude-design",
+    "design-systems",
+    "react",
+    "typescript",
+    "headless-ui",
+    "base-ui",
+    "react-aria",
+    "zag-js",
+    "accessibility",
+    "wcag",
+    "tokens"
+  ]
+}

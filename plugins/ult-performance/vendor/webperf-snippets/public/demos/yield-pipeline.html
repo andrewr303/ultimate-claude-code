@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield to Main: setTimeout vs queueMicrotask in the Event Loop</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --c-js: #58a6ff;    --c-js-fg: #79b8ff;
+  --c-raf: #d2a8ff;   --c-raf-fg: #d2a8ff;
+  --c-dirty: #e3b341; --c-dirty-fg: #e3b341;
+  --c-fsl: #f85149;   --c-fsl-fg: #ff7b72;
+  --c-ok: #3fb950;    --c-ok-fg: #3fb950;
+  --c-paint: #39d353; --c-paint-fg: #56d364;
+  --c-macro: #40c8ae; --c-macro-fg: #40c8ae;
+  --tab-active-bg: #1c2a3f;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --surface2: #eaeef2;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --muted: #656d76;
+  --c-js: #0969da;    --c-js-fg: #0969da;
+  --c-raf: #8250df;   --c-raf-fg: #8250df;
+  --c-dirty: #9a6700; --c-dirty-fg: #9a6700;
+  --c-fsl: #cf222e;   --c-fsl-fg: #cf222e;
+  --c-ok: #1a7f37;    --c-ok-fg: #1a7f37;
+  --c-paint: #1a7f37; --c-paint-fg: #1a7f37;
+  --c-macro: #0a7c6a; --c-macro-fg: #0a7c6a;
+  --tab-active-bg: #dbeafe;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pipeline-order {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+.pipeline-order-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+.po-step {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.po-sep { color: var(--muted); font-size: 12px; }
+.po-step--js    { background: rgba(88,166,255,.12); border: 1px solid var(--c-js); color: var(--c-js-fg); }
+.po-step--micro { background: rgba(210,168,255,.12); border: 1px solid var(--c-raf); color: var(--c-raf-fg); }
+.po-step--render { background: rgba(63,185,80,.12); border: 1px solid var(--c-ok); color: var(--c-ok-fg); }
+.po-step--next  { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color .15s, color .15s, background .15s;
+  line-height: 1.2;
+}
+.tab:hover { color: var(--text); border-color: #58a6ff; }
+.tab.active { color: var(--text); background: var(--tab-active-bg); border-color: var(--c-js); }
+
+.frames { display: flex; flex-direction: column; gap: 10px; }
+
+.frame {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.frame-label {
+  padding: 5px 12px;
+  background: var(--surface2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.frame-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.row-label {
+  width: 64px;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding-top: 6px;
+  text-align: right;
+}
+.row-items {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: .15;
+  transition: opacity .35s ease, transform .25s ease;
+}
+.step.shown { opacity: 1; }
+.step.active { transform: scale(1.06); }
+
+.step-box {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
+}
+.step-note {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.t-js    .step-box { background: rgba(88,166,255,.12); border-color: var(--c-js); color: var(--c-js-fg); }
+.t-raf   .step-box { background: rgba(210,168,255,.12); border-color: var(--c-raf); color: var(--c-raf-fg); }
+.t-dirty .step-box { background: rgba(227,179,65,.12); border-color: var(--c-dirty); color: var(--c-dirty-fg); }
+.t-fsl   .step-box { background: rgba(248,81,73,.15); border-color: var(--c-fsl); color: var(--c-fsl-fg); }
+.t-ok    .step-box { background: rgba(63,185,80,.12); border-color: var(--c-ok); color: var(--c-ok-fg); }
+.t-paint .step-box { background: rgba(57,211,83,.1); border-color: var(--c-paint); color: var(--c-paint-fg); }
+.t-clean .step-box { background: rgba(63,185,80,.08); border-color: var(--c-ok); color: var(--c-ok-fg); border-style: dashed; }
+.t-macro .step-box { background: rgba(64,200,174,.12); border-color: var(--c-macro); color: var(--c-macro-fg); }
+.t-empty .step-box { background: transparent; border-color: var(--border); color: var(--muted); border-style: dashed; font-style: italic; }
+
+.sep { color: var(--muted); font-size: 14px; margin-top: 4px; opacity: .5; }
+
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: .15;
+  transition: opacity .35s ease;
+  margin-top: 1px;
+}
+.badge.shown { opacity: 1; }
+.badge-fsl { background: rgba(248,81,73,.2); color: var(--c-fsl-fg); border: 1px solid var(--c-fsl); }
+.badge-ok  { background: rgba(63,185,80,.2); color: var(--c-ok); border: 1px solid var(--c-ok); }
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn:disabled { opacity: .4; cursor: default; }
+.btn-reset { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-next  { background: #1f6feb; color: #fff; }
+.btn-next:not(:disabled):hover { background: #388bfd; }
+.counter { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+.expl {
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--muted);
+  min-height: 58px;
+  transition: border-color .3s;
+}
+.expl strong { color: var(--text); }
+.expl code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px; background: var(--surface2); padding: 1px 4px; border-radius: 3px; color: var(--c-raf); }
+.expl.t-fsl { border-left-color: var(--c-fsl); }
+.expl.t-ok  { border-left-color: var(--c-ok); }
+.expl.t-neutral { border-left-color: var(--c-js); }
+
+.b-fsl { display: inline-block; background: rgba(248,81,73,.18); color: var(--c-fsl-fg); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; vertical-align: middle; }
+.b-ok  { display: inline-block; background: rgba(63,185,80,.18); color: var(--c-ok); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="pipeline-order">
+  <span class="pipeline-order-label">Event Loop</span>
+  <span class="po-step po-step--js">Macrotask</span>
+  <span class="po-sep">→</span>
+  <span class="po-step po-step--micro">Drain Microtasks</span>
+  <span class="po-sep">→</span>
+  <span class="po-step po-step--render">Render?</span>
+  <span class="po-sep">→</span>
+  <span class="po-step po-step--next">Next Macrotask</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-s="0">❌ No yield</button>
+  <button class="tab" data-s="1">⚠️ queueMicrotask</button>
+  <button class="tab" data-s="2">✅ setTimeout</button>
+</div>
+
+<div id="viz" class="frames"></div>
+
+<div class="controls">
+  <button class="btn btn-reset" id="btnReset">↩ Reset</button>
+  <button class="btn btn-next" id="btnNext">Next step →</button>
+  <span class="counter" id="counter"></span>
+</div>
+
+<div class="expl t-neutral" id="expl">
+  Press <strong>Next step</strong> to see how each strategy affects the event loop and INP.
+</div>
+
+<script>
+const S = [
+  // ─── Scenario 0: No yield ─────────────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Tick 1 — Single macrotask',
+        rows: [
+          { label: 'JS', items: [
+            { id: 's0-c1', type: 'dirty', text: 'chunk 1/3', note: '~170ms' },
+            { id: 's0-c2', type: 'dirty', text: 'chunk 2/3', note: '~170ms' },
+            { id: 's0-c3', type: 'dirty', text: 'chunk 3/3', note: '~170ms' },
+            { id: 's0-badge', type: 'badge-fsl', text: 'Long Task ⚠️' },
+          ]},
+          { label: 'μ Tasks', items: [
+            { id: 's0-mt', type: 'empty', text: 'empty' },
+          ]},
+          { label: 'Render?', items: [
+            { id: 's0-render', type: 'paint', text: '🎨 Paint', note: 'after ~500ms' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['s0-c1'], cls: 't-neutral', expl: '<strong>chunk 1/3</strong> runs synchronously (~170ms). There is no <code>await</code> or <code>setTimeout</code> between iterations: the loop never yields control back to the browser.' },
+      { ids: ['s0-c2'], cls: 't-neutral', expl: '<strong>chunk 2/3</strong>: the loop keeps running without stopping. The main thread has been blocked for ~340ms. No user interaction can be processed during this time.' },
+      { ids: ['s0-c3'], cls: 't-fsl', expl: '<strong>chunk 3/3</strong> completes processing. The entire task took ~500ms, well above the long task threshold (50ms).' },
+      { ids: ['s0-badge'], cls: 't-fsl', expl: '<span class="b-fsl">Long Task</span> The browser could not respond to interactions for ~500ms. A click during this time results in an INP of up to ~500ms; the "good" threshold is under 200ms.' },
+      { ids: ['s0-mt'], cls: 't-neutral', expl: 'No Promises or <code>queueMicrotask</code> were used: the microtask queue is empty. The browser moves directly to the render phase.' },
+      { ids: ['s0-render'], cls: 't-neutral', expl: 'Render happens, but it arrived ~500ms late. The INP of any interaction that occurred during processing is terrible.' },
+    ]
+  },
+
+  // ─── Scenario 1: queueMicrotask ───────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Tick 1 — Macrotask + microtask drain',
+        rows: [
+          { label: 'JS', items: [
+            { id: 's1-c1', type: 'js', text: 'chunk 1/3' },
+            { id: 's1-qm', type: 'raf', text: 'queueMicrotask ↓', note: 'await suspends' },
+          ]},
+          { label: 'μ Drain', items: [
+            { id: 's1-mu1', type: 'raf', text: 'μ: chunk 2/3' },
+            { id: 's1-qm2', type: 'raf', text: 'queueMicrotask ↓' },
+            { id: 's1-mu2', type: 'raf', text: 'μ: chunk 3/3' },
+            { id: 's1-block', type: 'badge-fsl', text: 'Render blocked ⚠️' },
+          ]},
+          { label: 'Render?', items: [
+            { id: 's1-render', type: 'paint', text: '🎨 Paint', note: 'after all 3 chunks' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['s1-c1'], cls: 't-neutral', expl: '<strong>chunk 1/3</strong> runs. Then <code>await new Promise(r => queueMicrotask(r))</code> calls <code>queueMicrotask(resolve)</code> synchronously and suspends the async function.' },
+      { ids: ['s1-qm'], cls: 't-neutral', expl: '<code>queueMicrotask</code> adds <code>resolve</code> to the <strong>microtask queue</strong>. The async function is suspended. The macrotask ends. Will render happen now?' },
+      { ids: ['s1-mu1'], cls: 't-fsl', expl: '<strong>No!</strong> The event loop order is: macrotask → drain microtasks → render? Microtasks drain <em>before</em> render. <code>resolve()</code> runs → the <code>await</code> continuation becomes a microtask → <strong>chunk 2/3</strong> runs.' },
+      { ids: ['s1-qm2'], cls: 't-fsl', expl: 'After chunk 2/3 finishes, another <code>queueMicrotask</code> adds more items to the queue. The drain continues: still no render.' },
+      { ids: ['s1-mu2'], cls: 't-fsl', expl: '<strong>chunk 3/3</strong> also runs inside the microtask drain. All three chunks ran with no render opportunity or interaction processing between them.' },
+      { ids: ['s1-block'], cls: 't-fsl', expl: '<span class="b-fsl">⚠️ Render blocked</span> Microtasks drain synchronously within the same cycle. The result is identical to the no-yield scenario: ~500ms of main thread blocking.' },
+      { ids: ['s1-render'], cls: 't-neutral', expl: 'The queue empties and render can happen. But <code>queueMicrotask</code> <strong>is not yield to main</strong>: it does not yield between chunks. INP does not improve.' },
+    ]
+  },
+
+  // ─── Scenario 2: setTimeout ───────────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Tick 1',
+        rows: [
+          { label: 'JS', items: [
+            { id: 's2-c1', type: 'js', text: 'chunk 1/3' },
+            { id: 's2-st1', type: 'macro', text: 'setTimeout(0) →', note: 'await suspends' },
+          ]},
+          { label: 'μ Tasks', items: [
+            { id: 's2-mt1', type: 'empty', text: 'empty' },
+          ]},
+          { label: 'Render?', items: [
+            { id: 's2-r1', type: 'ok', text: '✅ Render free' },
+          ]},
+        ]
+      },
+      {
+        label: 'Tick 2',
+        rows: [
+          { label: 'JS', items: [
+            { id: 's2-c2', type: 'js', text: 'chunk 2/3' },
+            { id: 's2-st2', type: 'macro', text: 'setTimeout(0) →', note: 'await suspends' },
+          ]},
+          { label: 'μ Tasks', items: [
+            { id: 's2-mt2', type: 'empty', text: 'empty' },
+          ]},
+          { label: 'Render?', items: [
+            { id: 's2-r2', type: 'ok', text: '✅ Render free' },
+          ]},
+        ]
+      },
+      {
+        label: 'Tick 3',
+        rows: [
+          { label: 'JS', items: [
+            { id: 's2-c3', type: 'js', text: 'chunk 3/3' },
+          ]},
+          { label: 'μ Tasks', items: [
+            { id: 's2-mt3', type: 'empty', text: 'empty' },
+          ]},
+          { label: 'Render?', items: [
+            { id: 's2-r3', type: 'paint', text: '🎨 Paint' },
+            { id: 's2-badge', type: 'badge-ok', text: 'No Long Tasks ✓' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['s2-c1'], cls: 't-neutral', expl: '<strong>chunk 1/3</strong> runs (~50ms). <code>await new Promise(r => setTimeout(r, 0))</code> puts <code>resolve</code> in the <strong>macrotask queue</strong> and suspends the async function.' },
+      { ids: ['s2-st1'], cls: 't-ok', expl: '<code>setTimeout(resolve, 0)</code> schedules a new macrotask. The function suspends and the current macrotask ends. The microtask queue is empty.' },
+      { ids: ['s2-mt1'], cls: 't-neutral', expl: 'No pending microtasks. The event loop can move forward.' },
+      { ids: ['s2-r1'], cls: 't-ok', expl: '<span class="b-ok">✅ Render free</span> Between macrotasks, the browser can render and process interactions. If the user clicks now, it responds immediately. Excellent INP.' },
+      { ids: ['s2-c2'], cls: 't-neutral', expl: 'New macrotask from the <code>setTimeout</code> queue: <strong>chunk 2/3</strong> runs in ~50ms. Processing continues where it left off.' },
+      { ids: ['s2-st2'], cls: 't-ok', expl: 'Another <code>setTimeout(resolve, 0)</code>. The process yields to the event loop again.' },
+      { ids: ['s2-mt2'], cls: 't-neutral', expl: 'Microtask queue empty.' },
+      { ids: ['s2-r2'], cls: 't-ok', expl: '<span class="b-ok">✅ Render free</span> Second render opportunity. The UI can update (e.g. a progress bar) and users can interact without latency.' },
+      { ids: ['s2-c3'], cls: 't-neutral', expl: '<strong>chunk 3/3</strong> completes processing in ~50ms.' },
+      { ids: ['s2-mt3'], cls: 't-neutral', expl: 'Microtask queue empty.' },
+      { ids: ['s2-r3'], cls: 't-ok', expl: 'Final render. Three tasks of ~50ms instead of one of ~500ms.' },
+      { ids: ['s2-badge'], cls: 't-ok', expl: '<span class="b-ok">✓ No long tasks</span> Each chunk is an independent macrotask under 50ms. The main thread yields between chunks: render and interactions are possible at all times. The same applies to <code>scheduler.postTask()</code>, which also schedules macrotasks.' },
+    ]
+  }
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let sIdx = 0;
+let stepIdx = 0;
+let revealed = new Set();
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  const sc = S[sIdx];
+  const viz = document.getElementById('viz');
+
+  viz.innerHTML = sc.frames.map(frame => `
+    <div class="frame">
+      <div class="frame-label">${frame.label}</div>
+      <div class="frame-body">
+        ${frame.rows.map(row => `
+          <div class="row">
+            <span class="row-label">${row.label}</span>
+            <div class="row-items">
+              ${row.items.map((item, i) => {
+                const sep = i < row.items.length - 1 ? '<span class="sep">→</span>' : '';
+                if (item.type === 'badge-fsl') {
+                  return `<span class="badge badge-fsl" id="${item.id}">${item.text}</span>${sep}`;
+                }
+                if (item.type === 'badge-ok') {
+                  return `<span class="badge badge-ok" id="${item.id}">${item.text}</span>${sep}`;
+                }
+                return `
+                  <div class="step t-${item.type}" id="${item.id}">
+                    <span class="step-box">${item.text}</span>
+                    ${item.note ? `<span class="step-note">${item.note}</span>` : ''}
+                  </div>${sep}
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  updateState();
+}
+
+function updateState() {
+  const sc = S[sIdx];
+
+  sc.frames.forEach(frame => {
+    frame.rows.forEach(row => {
+      row.items.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (!el) return;
+        el.classList.toggle('shown', revealed.has(item.id));
+        el.classList.toggle('active', false);
+      });
+    });
+  });
+
+  if (stepIdx > 0) {
+    const cur = sc.steps[stepIdx - 1];
+    cur.ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    });
+  }
+
+  const expl = document.getElementById('expl');
+  if (stepIdx === 0) {
+    expl.innerHTML = 'Press <strong>Next step</strong> to see how each strategy affects the event loop and INP.';
+    expl.className = 'expl t-neutral';
+  } else {
+    const cur = sc.steps[stepIdx - 1];
+    expl.innerHTML = cur.expl;
+    expl.className = `expl ${cur.cls}`;
+  }
+
+  const total = sc.steps.length;
+  document.getElementById('counter').textContent = `Step ${stepIdx} / ${total}`;
+  document.getElementById('btnNext').disabled = stepIdx >= total;
+}
+
+function nextStep() {
+  const sc = S[sIdx];
+  if (stepIdx >= sc.steps.length) return;
+  const cur = sc.steps[stepIdx];
+  cur.ids.forEach(id => revealed.add(id));
+  stepIdx++;
+  updateState();
+}
+
+function reset() {
+  stepIdx = 0;
+  revealed.clear();
+  render();
+}
+
+function setScenario(i) {
+  sIdx = i;
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j));
+  reset();
+}
+
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => setScenario(+t.dataset.s));
+});
+document.getElementById('btnNext').addEventListener('click', nextStep);
+document.getElementById('btnReset').addEventListener('click', reset);
+
+render();
+
+// ─── Theme ────────────────────────────────────────────────────────────────────
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t || 'dark');
+}
+(function initTheme() {
+  const stored = localStorage.getItem('theme');
+  if (stored) { applyTheme(stored); return; }
+  applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+})();
+window.addEventListener('storage', e => { if (e.key === 'theme') applyTheme(e.newValue); });
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+});
+
+// ─── Height notification ──────────────────────────────────────────────────────
+function notifyHeight() {
+  const h = document.body.offsetHeight;
+  window.parent.postMessage({ demoHeight: h }, '*');
+}
+new ResizeObserver(notifyHeight).observe(document.body);
+</script>
+</body>
+</html>

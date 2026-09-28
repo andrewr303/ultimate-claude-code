@@ -1,0 +1,548 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ui-component-expert.dev/schemas/v1/design-contract.json",
+  "title": "DesignContract",
+  "description": "Version 1 JSON Schema for UI Component Expert DesignContract",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "metadata",
+    "tokens",
+    "assets",
+    "hierarchy",
+    "components",
+    "unknowns",
+    "evidence"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Deterministic contract schema version 1"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "runId",
+        "schemaVersion",
+        "createdAt",
+        "sourceHashes",
+        "confidence",
+        "reviewStatus"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Immutable pipeline ingestion run UUID"
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "createdAt": {
+          "type": ["string", "null"],
+          "description": "Ingestion receipt timestamp, or null when absent; extraction never invents a timestamp"
+        },
+        "sourceHashes": {
+          "type": "array",
+          "description": "Checksums and byte lengths of all ingested source files from receipt",
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256"],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["observed", "inferred", "unknown"],
+          "description": "Heuristic confidence score for contract extraction"
+        },
+        "reviewStatus": {
+          "type": "string",
+          "enum": ["draft", "in_review", "approved", "rejected"],
+          "description": "Explicit human governance approval status; draft contracts cannot be marked ready"
+        },
+        "approvedBy": {
+          "type": ["string", "null"],
+          "description": "Reviewer identity for approved contract"
+        },
+        "approvedAt": {
+          "type": ["string", "null"],
+          "description": "ISO 8601 approval timestamp"
+        },
+        "sourceViewport": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "width": { "type": "number", "minimum": 1 },
+            "height": { "type": "number", "minimum": 1 }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "required": ["primitive", "semantic", "component"],
+      "additionalProperties": false,
+      "properties": {
+        "primitive": {
+          "type": "object",
+          "description": "Raw tier 1 tokens (empty in draft where unmapped)"
+        },
+        "semantic": {
+          "type": "object",
+          "description": "Intent-mapped tier 2 tokens (empty in draft where unmapped)"
+        },
+        "component": {
+          "type": "object",
+          "description": "Component-scoped tier 3 token mappings (empty in draft where unmapped)"
+        },
+        "themes": {
+          "type": "object",
+          "description": "Optional theme-specific token overrides"
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "description": "Verified local SVG glyphs and raster assets with unique IDs and license metadata",
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "license"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Safe relative path without traversal or Windows reserved names"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "dimensions": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "properties": {
+              "width": { "type": "number", "minimum": 0 },
+              "height": { "type": "number", "minimum": 0 }
+            }
+          },
+          "license": {
+            "type": ["string", "null"],
+            "description": "License identifier or null if unlicensed/unknown"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hierarchy": {
+      "type": "object",
+      "required": ["root"],
+      "additionalProperties": true,
+      "properties": {
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "regions": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "layout": { "type": "string" },
+            "navigation": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "content": { "type": "string" },
+            "sidebar": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "modalOverlayRoot": { "type": "string" }
+          }
+        },
+        "tree": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": true,
+            "properties": {
+              "id": { "type": "string" },
+              "role": { "type": "string" },
+              "children": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "description": "Reviewed component definitions with 8 canonical states. May be empty in unmapped draft.",
+      "items": {
+        "type": "object",
+        "required": [
+          "stableId",
+          "anatomy",
+          "props",
+          "events",
+          "backend",
+          "states"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "stableId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "Kebab-case stable component identifier"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "anatomy": {
+            "type": "object",
+            "required": ["root"],
+            "additionalProperties": true,
+            "properties": {
+              "root": { "type": "string", "minLength": 1 },
+              "slots": { "type": "object" },
+              "parts": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "props": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "type"],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": { "type": "string", "minLength": 1 },
+                    "type": { "type": "string", "minLength": 1 },
+                    "required": { "type": "boolean" },
+                    "default": {},
+                    "description": { "type": "string" }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "required": ["type"],
+                  "additionalProperties": true,
+                  "properties": {
+                    "type": { "type": "string", "minLength": 1 },
+                    "required": { "type": "boolean" },
+                    "default": {},
+                    "description": { "type": "string" }
+                  }
+                }
+              }
+            ]
+          },
+          "events": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name"],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": { "type": "string", "minLength": 1 },
+                    "type": { "type": "string" },
+                    "payload": { "type": "string" },
+                    "description": { "type": "string" }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "type": { "type": "string" },
+                    "payload": { "type": "string" },
+                    "description": { "type": "string" }
+                  }
+                }
+              }
+            ]
+          },
+          "backend": {
+            "type": "string",
+            "enum": ["base-ui", "react-aria", "zag", "native"],
+            "description": "Selected behavior primitive engine"
+          },
+          "states": {
+            "type": "object",
+            "required": [
+              "default",
+              "hover",
+              "focus",
+              "active",
+              "disabled",
+              "loading",
+              "error",
+              "selected"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "default": { "$ref": "#/definitions/canonicalStateEntry" },
+              "hover": { "$ref": "#/definitions/canonicalStateEntry" },
+              "focus": { "$ref": "#/definitions/canonicalStateEntry" },
+              "active": { "$ref": "#/definitions/canonicalStateEntry" },
+              "disabled": { "$ref": "#/definitions/canonicalStateEntry" },
+              "loading": { "$ref": "#/definitions/canonicalStateEntry" },
+              "error": { "$ref": "#/definitions/canonicalStateEntry" },
+              "selected": { "$ref": "#/definitions/canonicalStateEntry" },
+              "success": { "$ref": "#/definitions/canonicalStateEntry" }
+            }
+          },
+          "keyboard": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["key", "action"],
+                  "additionalProperties": true,
+                  "properties": {
+                    "key": { "type": "string" },
+                    "action": { "type": "string" },
+                    "description": { "type": "string" }
+                  }
+                }
+              },
+              "focusManagement": { "type": "string" }
+            }
+          },
+          "accessibility": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "role": { "type": "string" },
+              "ariaAttributes": { "type": "object" },
+              "labelStrategy": { "type": "string" },
+              "liveRegion": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "themes": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "properties": {
+        "light": { "type": "object" },
+        "dark": { "type": "object" },
+        "highContrast": { "type": "object" }
+      }
+    },
+    "rtl": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "supported": { "type": "boolean" },
+        "direction": {
+          "type": "string",
+          "enum": ["ltr", "rtl", "auto"]
+        },
+        "logicalProperties": { "type": "boolean" }
+      }
+    },
+    "reducedMotion": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "supported": { "type": "boolean" },
+        "fallback": { "type": "string" },
+        "behavior": { "type": "string" }
+      }
+    },
+    "responsive": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "properties": {
+        "breakpoints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number"]
+          }
+        },
+        "containerQueries": { "type": ["boolean", "null"] },
+        "rules": { "type": "array" }
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "description": "Required unresolved decisions and ambiguities preventing automatic readiness",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "required", "resolved"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "resolved": {
+            "type": "boolean"
+          },
+          "resolution": {
+            "type": ["string", "null"]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["path", "confidence"],
+            "additionalProperties": true,
+            "properties": {
+              "path": { "type": "string" },
+              "sha256": { "type": "string" },
+              "confidence": {
+                "type": "string",
+                "enum": ["observed", "inferred", "unknown"]
+              },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "confidence"],
+            "additionalProperties": true,
+            "properties": {
+              "id": { "type": "string" },
+              "path": { "type": "string" },
+              "sha256": { "type": "string" },
+              "confidence": {
+                "type": "string",
+                "enum": ["observed", "inferred", "unknown"]
+              },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      ]
+    },
+    "unmappedArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason"],
+        "additionalProperties": true,
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "canonicalStateEntry": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["applicable", "value"],
+          "additionalProperties": false,
+          "properties": {
+            "applicable": {
+              "type": "boolean",
+              "const": true
+            },
+            "value": {
+              "description": "Visual style definition or token map for applicable state"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["applicable", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "applicable": {
+              "type": "boolean",
+              "const": false
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Explicit rationale why this canonical state is non-applicable"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

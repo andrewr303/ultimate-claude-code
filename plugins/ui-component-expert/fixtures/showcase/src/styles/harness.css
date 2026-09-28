@@ -1,0 +1,177 @@
+/*
+ * State-harness chrome. Samples reuse the exact component classes from
+ * components.css — nothing here restyles product surfaces; it only frames
+ * them and adds the visually-hidden helper.
+ */
+
+.vh {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Only this region scrolls on narrow viewports; the page never does. */
+.harness-scroll {
+  overflow-x: auto;
+}
+
+.harness-table {
+  inline-size: 100%;
+  min-inline-size: 640px;
+  border-collapse: collapse;
+  border-block-start: 2px solid var(--line-strong);
+  font-size: var(--fs-200);
+}
+
+.harness-table caption {
+  caption-side: top;
+  text-align: start;
+  padding-block: 0 var(--space-s);
+  font: italic 400 var(--fs-300)/1.4 var(--font-serif);
+  color: var(--text-secondary);
+}
+
+.harness-table th {
+  padding: 10px 12px;
+  border-block-end: 1px solid var(--line-strong);
+  text-align: start;
+  white-space: nowrap;
+  font: 600 var(--fs-100)/1.2 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.harness-table td {
+  padding: 10px 12px;
+  border-block-end: 1px solid var(--line-hairline);
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.harness-component {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.harness-state {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.harness-state .harness-na {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.harness-note {
+  max-inline-size: 48ch;
+  color: var(--text-secondary);
+}
+
+.samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  align-items: center;
+}
+
+.sample-field {
+  min-inline-size: 220px;
+  max-inline-size: 280px;
+}
+
+.harness-group {
+  margin-block-start: var(--space-l);
+}
+
+.harness-group-title {
+  margin-block-end: var(--space-s);
+  font: 700 var(--fs-100)/1.4 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.harness-group > .harness-lead {
+  margin-block-end: var(--space-m);
+  font-size: var(--fs-200);
+  color: var(--text-secondary);
+}
+
+.harness-sample-table {
+  font-size: var(--fs-200);
+}
+
+.harness-status {
+  margin-block: var(--space-s) 0;
+  font-size: var(--fs-200);
+  color: var(--text-secondary);
+  min-block-size: 1.4em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Form playground and queue samples sit in a raised, bordered frame. */
+.playground {
+  display: grid;
+  gap: var(--space-m);
+  max-inline-size: 620px;
+  padding: var(--space-m);
+  border: 1px solid var(--line-hairline);
+  border-block-start: 2px solid var(--line-strong);
+  border-radius: var(--radius-m);
+  background: var(--surface-raised);
+}
+
+.playground-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  align-items: end;
+}
+
+.playground-controls .field {
+  min-inline-size: 220px;
+  flex: 0 1 260px;
+}
+
+.harness-queue {
+  margin-block-end: var(--space-l);
+}
+
+.cross-cutting {
+  display: grid;
+  gap: var(--space-2xs);
+  margin-block-start: var(--space-l);
+  max-inline-size: var(--measure);
+  font-size: var(--fs-300);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.cross-cutting dt {
+  font: 600 var(--fs-100)/1.4 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cross-cutting dd {
+  margin: 0;
+}
+
+.dialog-sample-copy {
+  font-size: var(--fs-300);
+  line-height: 1.5;
+  margin-block-end: var(--space-m);
+}
+
+.dialog-sample-copy code {
+  font-family: var(--font-mono);
+  font-size: var(--fs-200);
+}

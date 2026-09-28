@@ -1,0 +1,23 @@
+{
+  "name": "ult-engineer",
+  "version": "1.0.0",
+  "description": "Ultimate TypeScript, React, and Node.js engineering plugin: write, debug, refactor, review, and health-audit code. Default entry routes the agent to the right skill.",
+  "author": {
+    "name": "Andrew Rodriguez"
+  },
+  "license": "MIT",
+  "keywords": [
+    "typescript",
+    "react",
+    "nodejs",
+    "debugging",
+    "refactoring"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "Ult Engineer",
+    "shortDescription": "Write, debug, refactor, and review TypeScript / React / Node.js with runtime evidence.",
+    "category": "Engineering & developer tools"
+  }
+}

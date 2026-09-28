@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Canonical 8-state definitions, visual properties, ARIA mapping, and justified exclusion contracts for ui-component-expert interactive components.",
+  "states": {
+    "default": {
+      "name": "Default (Rest)",
+      "description": "Baseline interactive state when component is at rest, enabled, and unselected.",
+      "visualRequirements": [
+        "Baseline semantic background, text, and border tokens",
+        "Clear affordance indicating interactive capability"
+      ],
+      "ariaAttributes": {},
+      "domAttributes": {}
+    },
+    "hover": {
+      "name": "Hover",
+      "description": "Pointer device cursor positioned over the interactive boundary.",
+      "visualRequirements": [
+        "Subtle brightness, elevation, or contrast transition",
+        "Cursor changed to pointer where appropriate"
+      ],
+      "ariaAttributes": {},
+      "domAttributes": {},
+      "desktopOnly": true
+    },
+    "focus": {
+      "name": "Focus",
+      "description": "Keyboard or programmatic focus directed to the component element.",
+      "visualRequirements": [
+        "High-contrast visible focus ring (minimum 2px solid with 3:1 contrast against background)",
+        "Offset from element edge (1-2px) to prevent clipping"
+      ],
+      "ariaAttributes": {},
+      "domAttributes": {},
+      "ergonomicStandard": "WCAG 2.2 AA (2.4.7 focus visible), working toward AAA (2.4.13 focus appearance)"
+    },
+    "active": {
+      "name": "Active (Pressed)",
+      "description": "Primary pointer button down or keyboard Enter/Space activation.",
+      "visualRequirements": [
+        "Visual compression, darker shade, or depressed elevation",
+        "Immediate sensory feedback confirming activation"
+      ],
+      "ariaAttributes": {},
+      "domAttributes": {}
+    },
+    "disabled": {
+      "name": "Disabled",
+      "description": "Element is not operable, blocks click and key events, and is excluded from tab order.",
+      "visualRequirements": [
+        "Reduced opacity (e.g. 50-60%) or muted semantic color",
+        "Cursor set to not-allowed",
+        "No hover or active feedback"
+      ],
+      "ariaAttributes": {
+        "aria-disabled": "Not required on native HTML elements when native disabled attribute is present; used for custom non-native focusable disabled elements"
+      },
+      "domAttributes": {
+        "disabled": true
+      },
+      "keyboardBehavior": "Skipped in Tab order"
+    },
+    "loading": {
+      "name": "Loading (Busy)",
+      "description": "Asynchronous operation pending; interaction temporarily inhibited with progress indication.",
+      "visualRequirements": [
+        "Animated spinner or skeleton placeholder displayed",
+        "Original label preserved or replaced with loading status text"
+      ],
+      "ariaAttributes": {
+        "aria-busy": "true"
+      },
+      "domAttributes": {
+        "disabled": true
+      }
+    },
+    "error": {
+      "name": "Error (Invalid)",
+      "description": "Validation constraint failure on input, form, or interactive submission.",
+      "visualRequirements": [
+        "Error token border and icon (e.g. status-error red)",
+        "Descriptive, human-readable error message rendered below element"
+      ],
+      "ariaAttributes": {
+        "aria-invalid": "true (applied strictly to form input controls)",
+        "aria-describedby": "Bound to error message container ID"
+      },
+      "domAttributes": {}
+    },
+    "selected": {
+      "name": "Selected",
+      "canonicalKey": "selected",
+      "description": "Role-specific toggle, tab, radio, checkbox, or selectable item active/chosen state. (Note: success is an optional feedback state where applicable, not a replacement for selected).",
+      "visualRequirements": [
+        "Accent background, indicator badge, checkmark, or high-contrast border",
+        "Clear active selection affordance"
+      ],
+      "ariaAttributes": {
+        "aria-selected": "true (role-specific: tabs, listbox options, tree items)",
+        "aria-pressed": "true (role-specific: toggle buttons)",
+        "aria-checked": "true (role-specific: checkboxes, radio buttons, switch primitives)"
+      },
+      "domAttributes": {}
+    }
+  },
+  "exclusionRules": {
+    "requirement": "Any interactive control omitting one of the 8 canonical states MUST document an explicit non-empty reason string in its contract definition (NonApplicableState).",
+    "validReasons": [
+      "NOT_A_TOGGLE: Single-action trigger (e.g. standard submit button) does not possess a persistent selected or toggle state.",
+      "STATIC_TRIGGER: Action cannot fail validation independently; error state handled at form container level.",
+      "INSTANT_EXECUTION: Synchronous action completes instantly without asynchronous loading state."
+    ]
+  }
+}

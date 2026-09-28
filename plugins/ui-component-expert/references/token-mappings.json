@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Three-tier token architecture schema and mapping specification for ui-component-expert, synthesized from design-system-ops and ux-ui-agent-skills.",
+  "tiers": {
+    "tier1_primitive": {
+      "description": "Raw, context-agnostic design values (color scales, spacing scale, font stacks, radiuses)",
+      "categories": [
+        "colors",
+        "spacing",
+        "typography",
+        "radiuses",
+        "shadows",
+        "transitions"
+      ],
+      "examples": {
+        "color-blue-500": "#3b82f6",
+        "color-slate-900": "#0f172a",
+        "space-1": "0.25rem",
+        "space-2": "0.5rem",
+        "space-4": "1rem",
+        "radius-sm": "0.25rem",
+        "radius-md": "0.375rem",
+        "radius-lg": "0.5rem",
+        "font-sans": "system-ui, -apple-system, sans-serif"
+      }
+    },
+    "tier2_semantic": {
+      "description": "Intent-mapped tokens expressing roles, surfaces, text emphasis, and interactive states",
+      "categories": [
+        "surface",
+        "text",
+        "border",
+        "action",
+        "feedback",
+        "focus"
+      ],
+      "mappings": {
+        "background-canvas": "primitive.color-slate-50",
+        "background-surface": "primitive.color-white",
+        "background-subtle": "primitive.color-slate-100",
+        "text-primary": "primitive.color-slate-900",
+        "text-muted": "primitive.color-slate-500",
+        "text-inverse": "primitive.color-white",
+        "border-subtle": "primitive.color-slate-200",
+        "border-strong": "primitive.color-slate-400",
+        "action-primary-default": "primitive.color-blue-600",
+        "action-primary-hover": "primitive.color-blue-700",
+        "action-primary-active": "primitive.color-blue-800",
+        "status-error": "primitive.color-red-600",
+        "status-warning": "primitive.color-amber-500",
+        "status-success": "primitive.color-emerald-600",
+        "focus-ring": "primitive.color-blue-500"
+      }
+    },
+    "tier3_component": {
+      "description": "Component-specific token overrides bound to named slots",
+      "components": {
+        "button": {
+          "primary-bg": "semantic.action-primary-default",
+          "primary-bg-hover": "semantic.action-primary-hover",
+          "primary-text": "semantic.text-inverse",
+          "border-radius": "primitive.radius-md",
+          "padding-x": "primitive.space-4",
+          "padding-y": "primitive.space-2"
+        },
+        "dialog": {
+          "surface-bg": "semantic.background-surface",
+          "backdrop-bg": "rgba(0, 0, 0, 0.5)",
+          "border": "semantic.border-subtle",
+          "shadow": "primitive.shadow-xl"
+        },
+        "table": {
+          "header-bg": "semantic.background-subtle",
+          "header-text": "semantic.text-primary",
+          "row-border": "semantic.border-subtle",
+          "row-hover-bg": "semantic.background-subtle"
+        }
+      }
+    }
+  },
+  "adaptation": {
+    "tailwind_v4": {
+      "format": "@theme directives and CSS custom properties",
+      "classMapping": "bg-[var(--background-surface)] text-[var(--text-primary)]"
+    },
+    "tailwind_v3": {
+      "format": "tailwind.config.js theme.extend",
+      "classMapping": "bg-surface text-primary"
+    },
+    "css_modules": {
+      "format": "var(--token-name) in .module.css files",
+      "classMapping": "styles.root referencing variables"
+    }
+  }
+}

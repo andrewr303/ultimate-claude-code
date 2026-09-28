@@ -1,0 +1,21 @@
+{
+  "name": "ult-performance",
+  "version": "1.0.0",
+  "description": "Ultimate web performance plugin: measured Core Web Vitals, loading, interaction, media, animation, accessibility, SEO, and quality audits. Default entry routes the agent to the right skill.",
+  "author": {
+    "name": "Ult Performance"
+  },
+  "license": "MIT",
+  "keywords": [
+    "performance",
+    "core-web-vitals",
+    "lighthouse",
+    "web-vitals"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ult Performance",
+    "shortDescription": "Measured web performance, Core Web Vitals, and quality audits.",
+    "category": "Productivity"
+  }
+}

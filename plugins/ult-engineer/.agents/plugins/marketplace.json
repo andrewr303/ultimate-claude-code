@@ -1,0 +1,21 @@
+{
+  "name": "ult-engineer",
+  "interface": {
+    "displayName": "Ult Engineer"
+  },
+  "plugins": [
+    {
+      "name": "ult-engineer",
+      "description": "Ultimate TypeScript, React, and Node.js engineering plugin: write, debug, refactor, review, and health-audit code.",
+      "source": {
+        "source": "local",
+        "path": "./codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Engineering"
+    }
+  ]
+}

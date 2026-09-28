@@ -1,0 +1,17 @@
+{
+  "name": "ultimate-sdd-marketplace",
+  "metadata": {
+    "description": "Local-first spec-driven development for coding agents.",
+    "version": "1.0.0"
+  },
+  "owner": {
+    "name": "andrewr303"
+  },
+  "plugins": [
+    {
+      "name": "ultimate-sdd",
+      "source": "./",
+      "description": "Local-first spec-driven development: PRDs, EPICs, REQs, verifiable TASKs, CHANGE deltas, and delivery pipelines."
+    }
+  ]
+}

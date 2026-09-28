@@ -1,0 +1,22 @@
+{
+  "name": "ult-engineer",
+  "version": "1.0.0",
+  "description": "Ultimate TypeScript, React, and Node.js engineering plugin: write, debug, refactor, review, and health-audit code. Default entry routes the agent to the right skill.",
+  "keywords": [
+    "typescript",
+    "react",
+    "nodejs",
+    "debugging",
+    "refactoring"
+  ],
+  "license": "MIT",
+  "skills": "./skills/",
+  "systemPromptPath": "./SYSTEM.md",
+  "sessionStart": {
+    "skill": "ult-engineer"
+  },
+  "interface": {
+    "displayName": "Ult Engineer",
+    "shortDescription": "Write, debug, refactor, and review TypeScript / React / Node.js with runtime evidence."
+  }
+}

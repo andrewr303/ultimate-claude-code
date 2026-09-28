@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network waterfall: HTTP/1.1, Keep-Alive, HTTP/2 and preconnect</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --c-hs: #f85149;   --c-hs-fg: #ff7b72;   /* handshake TCP/TLS */
+  --c-dl: #58a6ff;   --c-dl-fg: #79b8ff;   /* download */
+  --c-pre: #d2a8ff;  --c-pre-fg: #d2a8ff;  /* preconnect */
+  --c-ttfb: #e3b341; --c-ttfb-fg: #e3b341; /* server wait */
+  --c-ok: #3fb950;   --c-ok-fg: #56d364;
+  --tab-active-bg: #1c2a3f;
+  --grid: rgba(139,148,158,.18);
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --surface2: #eaeef2;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --muted: #656d76;
+  --c-hs: #cf222e;   --c-hs-fg: #cf222e;
+  --c-dl: #0969da;   --c-dl-fg: #0969da;
+  --c-pre: #8250df;  --c-pre-fg: #8250df;
+  --c-ttfb: #9a6700; --c-ttfb-fg: #9a6700;
+  --c-ok: #1a7f37;   --c-ok-fg: #1a7f37;
+  --tab-active-bg: #dbeafe;
+  --grid: rgba(101,109,118,.16);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Tabs ──────────────────────────────────── */
+.chooser { display: flex; flex-direction: column; gap: 9px; }
+.chooser-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex-wrap: wrap;
+}
+.chooser-icon { font-size: 15px; line-height: 1; }
+.chooser-hint { color: var(--muted); font-weight: 500; }
+.chooser-arrow { color: var(--c-dl-fg); font-weight: 700; }
+
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab {
+  position: relative;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  transition: border-color .15s, background .15s, transform .12s, box-shadow .15s;
+}
+.tab:hover {
+  border-color: var(--c-dl);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,.28);
+}
+.tab:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.tab:focus-visible { outline: 2px solid var(--c-dl); outline-offset: 2px; }
+.tab.active {
+  background: var(--tab-active-bg);
+  border-color: var(--c-dl);
+  box-shadow: 0 0 0 1px var(--c-dl), 0 1px 2px rgba(0,0,0,.2);
+}
+[data-theme="light"] .tab { box-shadow: 0 1px 2px rgba(31,35,40,.1); }
+[data-theme="light"] .tab:hover { box-shadow: 0 3px 8px rgba(31,35,40,.14); }
+[data-theme="light"] .tab.active { box-shadow: 0 0 0 1px var(--c-dl), 0 1px 2px rgba(31,35,40,.1); }
+
+/* ── Stats ─────────────────────────────────── */
+.stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat {
+  flex: 1 1 150px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  font-weight: 600;
+}
+.stat-value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+.stat-value small { font-size: 13px; font-weight: 500; color: var(--muted); }
+.stat--total .stat-value { color: var(--c-dl-fg); }
+.stat--conn .stat-value { color: var(--c-hs-fg); }
+.stat--hs .stat-value { color: var(--c-ttfb-fg); }
+
+/* ── Waterfall ─────────────────────────────── */
+.waterfall {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 14px 8px;
+}
+.wf-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.wf-name {
+  width: 116px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 600;
+  text-align: right;
+  line-height: 1.25;
+}
+.wf-name small { display: block; font-weight: 400; color: var(--muted); font-size: 10px; }
+.wf-track {
+  position: relative;
+  flex: 1;
+  height: 22px;
+  background: linear-gradient(var(--grid),var(--grid)) repeat-x;
+  border-radius: 3px;
+}
+.seg {
+  position: absolute;
+  top: 2px;
+  height: 18px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: left .5s ease, width .5s ease;
+}
+.seg-hs   { background: var(--c-hs); }
+.seg-dl   { background: var(--c-dl); }
+.seg-pre  { background: var(--c-pre); }
+.seg-ttfb { background: var(--c-ttfb); }
+.seg-queue {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+}
+[data-theme="light"] .seg-dl,
+[data-theme="light"] .seg-pre,
+[data-theme="light"] .seg-ttfb { color: #fff; }
+
+/* connection lifecycle chip */
+.wf-cap {
+  width: 96px;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cap-close { color: var(--c-hs-fg); }
+.cap-keep  { color: var(--c-ok-fg); }
+.cap-mux   { color: var(--c-pre-fg); }
+
+/* axis */
+.wf-axis { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.wf-axis .wf-name { color: var(--muted); }
+.axis-track { position: relative; flex: 1; height: 16px; }
+.axis-spacer { width: 96px; flex-shrink: 0; }
+.tick { position: absolute; top: 0; font-size: 9px; color: var(--muted); transform: translateX(-50%); }
+.tick::before {
+  content: '';
+  position: absolute;
+  top: -6px; left: 50%;
+  width: 1px; height: 4px;
+  background: var(--border);
+}
+
+/* ── Legend ────────────────────────────────── */
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.dot-hs { background: var(--c-hs); }
+.dot-dl { background: var(--c-dl); }
+.dot-pre { background: var(--c-pre); }
+.dot-ttfb { background: var(--c-ttfb); }
+.dot-q { border: 1px dashed var(--border); }
+
+/* ── Callout ───────────────────────────────── */
+.callout {
+  display: none;
+  background: rgba(227,179,65,.1);
+  border: 1px solid var(--c-ttfb);
+  border-left-width: 3px;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.callout.shown { display: block; }
+.callout strong { font-weight: 700; }
+
+/* ── Steps ─────────────────────────────────── */
+.steps-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-left-color: var(--c-dl);
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+.steps-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.steps { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 7px; }
+.steps li {
+  counter-increment: s;
+  position: relative;
+  padding-left: 26px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.steps li::before {
+  content: counter(s);
+  position: absolute;
+  left: 0; top: 0;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.steps strong { color: var(--text); }
+.steps code {
+  font-family: 'SF Mono','Consolas',monospace;
+  font-size: 12px;
+  background: var(--surface2);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--c-pre-fg);
+}
+.tag-win {
+  display: inline-block;
+  background: rgba(63,185,80,.18);
+  color: var(--c-ok);
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px;
+  vertical-align: middle;
+}
+.tag-cost {
+  display: inline-block;
+  background: rgba(248,81,73,.18);
+  color: var(--c-hs-fg);
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px;
+  vertical-align: middle;
+}
+</style>
+</head>
+<body>
+
+<!-- Tabs -->
+<div class="chooser">
+  <div class="chooser-label">
+    <span class="chooser-icon">👆</span>
+    <span>Pick a scenario</span>
+    <span class="chooser-hint">tap to compare the four waterfalls</span>
+    <span class="chooser-arrow" aria-hidden="true">↓</span>
+  </div>
+  <div class="tabs" role="group" aria-label="Network scenarios">
+    <button class="tab active" data-s="0" aria-pressed="true">HTTP/1.1 · Connection: close</button>
+    <button class="tab" data-s="1" aria-pressed="false">HTTP/1.1 · keep-alive</button>
+    <button class="tab" data-s="2" aria-pressed="false">HTTP/2</button>
+    <button class="tab" data-s="3" aria-pressed="false">HTTP/2 + preconnect</button>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat stat--conn">
+    <div class="stat-label">TCP connections opened</div>
+    <div class="stat-value" id="statConn">3</div>
+  </div>
+  <div class="stat stat--hs">
+    <div class="stat-label">Handshakes on the critical path</div>
+    <div class="stat-value" id="statHs">2</div>
+  </div>
+  <div class="stat stat--total">
+    <div class="stat-label">Estimated total time</div>
+    <div class="stat-value" id="statTotal">570 <small>ms</small></div>
+  </div>
+</div>
+
+<!-- Waterfall -->
+<div class="waterfall">
+  <div id="wf"></div>
+  <div class="wf-axis">
+    <span class="wf-name">Time</span>
+    <div class="axis-track" id="axis"></div>
+    <span class="axis-spacer"></span>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <span><i class="dot dot-hs"></i> TCP/TLS handshake</span>
+  <span><i class="dot dot-pre"></i> preconnect</span>
+  <span><i class="dot dot-ttfb"></i> Server wait (TTFB)</span>
+  <span><i class="dot dot-dl"></i> Download</span>
+  <span><i class="dot dot-q"></i> Queued / blocked</span>
+</div>
+
+<!-- Callout -->
+<div class="callout" id="callout"></div>
+
+<!-- Steps -->
+<div class="steps-wrap" id="stepsWrap">
+  <div class="steps-title">What the browser does under the hood</div>
+  <ol class="steps" id="steps"></ol>
+</div>
+
+<script>
+// ─── Model ──────────────────────────────────────────────────────────────────
+// Fixed time scale so bars are comparable between scenarios.
+const SCALE = 650; // ms
+// Building blocks (ms):
+//   handshake (TCP+TLS) = 100 · HTML (hs+ttfb+download) = 250
+//   download proportional to weight: image-1 (608 KB) = 220 · image-2 (403 KB) = 150
+//
+// Realistic model: document on the main origin, both images on a separate assets
+// origin (CDN). HTTP/1.1 has no multiplexing, so the browser opens up to 6 parallel
+// connections per origin. For 2 concurrent images that means 2 parallel connections,
+// each with its own handshake. close and keep-alive therefore cost THE SAME on the
+// first load; keep-alive only helps by reusing the open connection on later requests.
+//
+// Each row: { name, sub, segs:[{type,start,end,label?}], cap?:{text,cls} }
+//   type: queue | hs | ttfb | dl | pre · cap cls: cap-close | cap-keep | cap-mux
+
+const S = [
+  // ── 0 · HTTP/1.1 Connection: close ─────────────────────────────────────────
+  {
+    conn: 3,
+    hs: 2,
+    total: 570,
+    rows: [
+      { name: 'document', sub: 'origin A', cap: { text: '✕ closes', cls: 'cap-close' }, segs: [
+        { type: 'hs', start: 0, end: 100 },
+        { type: 'ttfb', start: 100, end: 150 },
+        { type: 'dl', start: 150, end: 250, label: 'HTML' },
+      ]},
+      { name: 'image-1.jpg', sub: 'assets · conn 1', cap: { text: '✕ closes', cls: 'cap-close' }, segs: [
+        { type: 'queue', start: 0, end: 250 },
+        { type: 'hs', start: 250, end: 350 },
+        { type: 'dl', start: 350, end: 570, label: '608 KB' },
+      ]},
+      { name: 'image-2.jpg', sub: 'assets · conn 2', cap: { text: '✕ closes', cls: 'cap-close' }, segs: [
+        { type: 'queue', start: 0, end: 250 },
+        { type: 'hs', start: 250, end: 350 },
+        { type: 'dl', start: 350, end: 500, label: '403 KB' },
+      ]},
+    ],
+    steps: [
+      'The browser downloads the document HTML and, while parsing it, discovers the two images on the assets domain.',
+      'HTTP/1.1 has no multiplexing: each connection serves one request at a time. To fetch both images in parallel, it opens <strong>two connections</strong> to the assets domain (the limit is ~6 per origin).',
+      '<span class="tag-cost">cost</span> Each connection negotiates its own <strong>TCP + TLS handshake</strong>. That is two handshakes, in parallel, before any download starts.',
+      'With <code>Connection: close</code> each connection <strong>closes when it finishes</strong> its download. Nothing is left to reuse.',
+      'Result: <strong>3 TCP connections</strong> (1 document + 2 assets) and two handshakes on the critical path. With more than 6 resources on this origin, the rest would queue.',
+    ],
+  },
+
+  // ── 1 · HTTP/1.1 keep-alive ────────────────────────────────────────────────
+  {
+    conn: 3,
+    hs: 2,
+    total: 570,
+    note: '<strong>Notice:</strong> the waterfall is identical to <code>Connection: close</code>. Keep-Alive <strong>does not speed up</strong> this first load; its benefit is reusing the open connection on <strong>later requests</strong>.',
+    rows: [
+      { name: 'document', sub: 'origin A', cap: { text: '♻ stays open', cls: 'cap-keep' }, segs: [
+        { type: 'hs', start: 0, end: 100 },
+        { type: 'ttfb', start: 100, end: 150 },
+        { type: 'dl', start: 150, end: 250, label: 'HTML' },
+      ]},
+      { name: 'image-1.jpg', sub: 'assets · conn 1', cap: { text: '♻ stays open', cls: 'cap-keep' }, segs: [
+        { type: 'queue', start: 0, end: 250 },
+        { type: 'hs', start: 250, end: 350 },
+        { type: 'dl', start: 350, end: 570, label: '608 KB' },
+      ]},
+      { name: 'image-2.jpg', sub: 'assets · conn 2', cap: { text: '♻ stays open', cls: 'cap-keep' }, segs: [
+        { type: 'queue', start: 0, end: 250 },
+        { type: 'hs', start: 250, end: 350 },
+        { type: 'dl', start: 350, end: 500, label: '403 KB' },
+      ]},
+    ],
+    steps: [
+      'Same as with <code>close</code>: the browser opens <strong>two parallel connections</strong> to the assets domain and negotiates both handshakes.',
+      '<span class="tag-cost">same load</span> The images download in <strong>exactly the same time</strong> as with <code>close</code>. Keep-Alive does not speed up this load.',
+      'The difference: with <code>Connection: keep-alive</code> the connections <strong>stay open</strong> in the pool after the download.',
+      '<span class="tag-win">saved</span> The benefit shows up on the <strong>next request</strong> to that origin (another image, a navigation): it reuses an open connection and skips the handshake.',
+      'It is the same misunderstanding as with caching: reusing the pipe does not speed up the first load, only the ones after it. <strong>Keep-Alive is not Cache-Control.</strong>',
+    ],
+  },
+
+  // ── 2 · HTTP/2 ─────────────────────────────────────────────────────────────
+  {
+    conn: 2,
+    hs: 1,
+    total: 570,
+    rows: [
+      { name: 'document', sub: 'origin A', segs: [
+        { type: 'hs', start: 0, end: 100 },
+        { type: 'ttfb', start: 100, end: 150 },
+        { type: 'dl', start: 150, end: 250, label: 'HTML' },
+      ]},
+      { name: 'image-1.jpg', sub: 'assets · stream 1', cap: { text: '♻ 1 connection', cls: 'cap-mux' }, segs: [
+        { type: 'queue', start: 0, end: 250 },
+        { type: 'hs', start: 250, end: 350 },
+        { type: 'dl', start: 350, end: 570, label: '608 KB · stream 1' },
+      ]},
+      { name: 'image-2.jpg', sub: 'assets · stream 2', cap: { text: '♻ same connection', cls: 'cap-mux' }, segs: [
+        { type: 'queue', start: 0, end: 350 },
+        { type: 'dl', start: 350, end: 500, label: '403 KB · stream 2' },
+      ]},
+    ],
+    steps: [
+      'The browser downloads the HTML and discovers the two images on the assets domain.',
+      'It opens <strong>a single HTTP/2 connection</strong> to assets, with one TCP/TLS handshake. <code>Connection: keep-alive</code> does not even apply: HTTP/2 keeps and multiplexes the connection by design.',
+      '<span class="tag-win">saved</span> With <strong>multiplexing</strong>, the two images travel as independent streams over <strong>the same connection</strong>, in parallel and without the 6-connection limit.',
+      'We drop from 3 to <strong>2 TCP connections</strong> and from 2 handshakes to <strong>1</strong>. That handshake to assets is still on the critical path, right after parsing the HTML.',
+      'For 2 images the total time barely changes versus HTTP/1.1; the big win of HTTP/2 shows up <strong>as the number of resources grows</strong>.',
+    ],
+  },
+
+  // ── 3 · HTTP/2 + preconnect ────────────────────────────────────────────────
+  {
+    conn: 2,
+    hs: 0,
+    total: 470,
+    rows: [
+      { name: 'document', sub: 'origin A', segs: [
+        { type: 'hs', start: 0, end: 100 },
+        { type: 'ttfb', start: 100, end: 150 },
+        { type: 'dl', start: 150, end: 250, label: 'HTML' },
+      ]},
+      { name: 'preconnect', sub: 'assets', segs: [
+        { type: 'pre', start: 0, end: 100, label: 'TCP/TLS in parallel' },
+      ]},
+      { name: 'image-1.jpg', sub: 'assets · stream 1', cap: { text: '♻ already open', cls: 'cap-mux' }, segs: [
+        { type: 'queue', start: 0, end: 250, label: 'connection ready' },
+        { type: 'dl', start: 250, end: 470, label: '608 KB · stream 1' },
+      ]},
+      { name: 'image-2.jpg', sub: 'assets · stream 2', cap: { text: '♻ already open', cls: 'cap-mux' }, segs: [
+        { type: 'queue', start: 0, end: 250 },
+        { type: 'dl', start: 250, end: 400, label: '403 KB · stream 2' },
+      ]},
+    ],
+    steps: [
+      'The HTML includes <code>&lt;link rel="preconnect" href="https://assets.example.com"&gt;</code> in the <code>&lt;head&gt;</code>.',
+      '<span class="tag-win">saved</span> As soon as it reads that tag, the browser opens the connection to assets and resolves the <strong>TCP/TLS handshake in parallel</strong> with the HTML download.',
+      'By the time it finishes parsing the HTML and discovers the images, the connection to assets is <strong>already open</strong>: handshake resolved.',
+      'Both images start downloading <strong>instantly</strong> and multiplexed, without waiting for any handshake.',
+      '<span class="tag-win">−100 ms</span> The handshake <strong>disappears from the critical path</strong>: 2 connections, 0 handshakes waiting. It is the fastest scenario, and the only one that cuts the total time.',
+    ],
+  },
+];
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+let sIdx = 0;
+
+function pct(v) { return (v / SCALE * 100).toFixed(2) + '%'; }
+
+function renderWaterfall() {
+  const sc = S[sIdx];
+  const wf = document.getElementById('wf');
+  wf.innerHTML = sc.rows.map(row => `
+    <div class="wf-row">
+      <div class="wf-name">${row.name}<small>${row.sub}</small></div>
+      <div class="wf-track">
+        ${row.segs.map(s => {
+          const left = pct(s.start);
+          const width = pct(s.end - s.start);
+          const label = s.label && (s.end - s.start) > 90 ? s.label : '';
+          return `<div class="seg seg-${s.type}" style="left:${left};width:${width}" title="${s.label || s.type} (${s.start}–${s.end} ms)">${label}</div>`;
+        }).join('')}
+      </div>
+      <div class="wf-cap ${row.cap ? row.cap.cls : ''}">${row.cap ? row.cap.text : ''}</div>
+    </div>
+  `).join('');
+
+  // axis ticks every 100 ms
+  const axis = document.getElementById('axis');
+  let ticks = '';
+  for (let t = 0; t <= SCALE; t += 100) {
+    ticks += `<span class="tick" style="left:${pct(t)}">${t}</span>`;
+  }
+  axis.innerHTML = ticks;
+
+  // stats
+  document.getElementById('statConn').textContent = sc.conn;
+  document.getElementById('statHs').textContent = sc.hs;
+  document.getElementById('statTotal').innerHTML = `${sc.total} <small>ms</small>`;
+
+  // callout
+  const callout = document.getElementById('callout');
+  if (sc.note) {
+    callout.innerHTML = sc.note;
+    callout.classList.add('shown');
+  } else {
+    callout.classList.remove('shown');
+  }
+
+  // steps
+  document.getElementById('steps').innerHTML = sc.steps.map(s => `<li>${s}</li>`).join('');
+}
+
+function setScenario(i) {
+  sIdx = i;
+  document.querySelectorAll('.tab').forEach((t, j) => {
+    const active = i === j;
+    t.classList.toggle('active', active);
+    t.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+  renderWaterfall();
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => setScenario(+t.dataset.s));
+});
+
+renderWaterfall();
+
+// ─── Theme ──────────────────────────────────────────────────────────────────
+function applyTheme(t) { document.documentElement.setAttribute('data-theme', t || 'dark'); }
+(function initTheme() {
+  const stored = localStorage.getItem('theme');
+  if (stored) { applyTheme(stored); return; }
+  applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+})();
+window.addEventListener('storage', e => { if (e.key === 'theme') applyTheme(e.newValue); });
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+});
+
+// ─── Height notification ──────────────────────────────────────────────────────
+function notifyHeight() {
+  window.parent.postMessage({ demoHeight: document.body.offsetHeight }, '*');
+}
+new ResizeObserver(notifyHeight).observe(document.body);
+</script>
+</body>
+</html>

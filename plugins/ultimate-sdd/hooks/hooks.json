@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session.py\" session-start || python \"${CLAUDE_PLUGIN_ROOT}/hooks/session.py\" session-start"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session.py\" pre-compact || python \"${CLAUDE_PLUGIN_ROOT}/hooks/session.py\" pre-compact"
+          }
+        ]
+      }
+    ]
+  }
+}

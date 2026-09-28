@@ -1,0 +1,7 @@
+{
+  "name": "ui-component-expert",
+  "version": "0.1.0",
+  "description": "Manual Claude Design export to reviewed React and TypeScript components, with explicit verification and integration gates.",
+  "skills": "./kimi/skills/",
+  "commands": "./kimi/commands/"
+}

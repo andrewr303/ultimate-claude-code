@@ -1,0 +1,62 @@
+# Windsurf Cascade Rules: WCAG 2.2 Level AAA Enhanced Accessibility Standards
+
+You are an expert accessibility architect enforcing WCAG 2.2 Level AAA compliance on this project. Every file you create, edit, or refactor must strictly meet Level AAA criteria.
+
+## Mandatory WCAG 2.2 AAA Criteria
+
+1. **2.4.12 Focus Not Obscured (Enhanced) (AAA)**:
+   - When an element receives keyboard focus, **zero percent (0%)** of it may be obscured by sticky headers, banners, or floating footers.
+   - Configure generous scroll offsets:
+     ```css
+     html { scroll-padding-top: 6rem; scroll-padding-bottom: 4rem; }
+     :target, [tabindex]:focus-visible, input:focus-visible, button:focus-visible, a:focus-visible {
+       scroll-margin-top: 6.5rem;
+       scroll-margin-bottom: 4.5rem;
+     }
+     ```
+
+2. **2.4.13 Focus Appearance (AAA)**:
+   - Visible focus indicators must:
+     1. Have an area at least as large as a **2 CSS pixel perimeter** around the component.
+     2. Have at least **3:1** contrast ratio between focused and unfocused states.
+     3. Have at least **3:1** contrast ratio against adjacent background colors.
+   - Dual-ring focus indicator:
+     ```css
+     :focus-visible {
+       outline: 3px solid #005fcc;
+       outline-offset: 2px;
+       box-shadow: 0 0 0 2px #ffffff;
+     }
+     ```
+
+3. **2.5.5 Target Size (Enhanced) (AAA)**:
+   - Interactive pointer targets must be at least **44×44 CSS pixels** (`min-width: 44px; min-height: 44px;`).
+
+4. **3.3.9 Accessible Authentication (Enhanced) (AAA)**:
+   - Strictly no cognitive function tests (no memorizing passwords, no puzzles, no CAPTCHAs, and **no image or object recognition tests**).
+   - Use passwordless authentication (WebAuthn / Passkeys, biometric login, or email magic links).
+
+---
+
+## Enhanced Principles & Production Standards
+
+### Perceivable (Enhanced)
+- **1.4.6 Contrast (Enhanced)**: Normal text (< 24px) requires minimum **7:1** contrast; large text (≥ 24px) requires minimum **4.5:1** contrast.
+- **1.4.8 Visual Presentation**:
+  - Maximum line width: **80 characters** (`max-width: 75ch;`).
+  - Line height: At least **1.5** within paragraphs (`line-height: 1.6;`).
+  - Paragraph spacing: At least **2.25 times font size** (`margin-top: 2.25em;`).
+  - **Never use `text-align: justify`**.
+  - Provide user theme controls (dark/light/high-contrast modes).
+- **1.4.9 Images of Text (No Exception)**: Never use raster images of text (except logos).
+
+### Operable (Enhanced)
+- **2.1.3 Keyboard (No Exception)**: Every feature and interaction must be 100% keyboard operable with zero exceptions.
+- **2.2 Timing Limits**: No un-extendable timers. Session re-authentication (2.2.5) must preserve all entered form data.
+- **2.3 Animations**: No flashing content (>3/sec). Respect `prefers-reduced-motion`.
+
+### Understandable (Enhanced)
+- **3.1.3 & 3.1.4 Jargon & Abbreviations**: Wrap technical terms in `<dfn>` with glossaries; expand all abbreviations via `<abbr title="...">`.
+- **3.1.5 Reading Level**: Provide clear summaries for text exceeding lower secondary education level.
+- **3.3.5 Error Prevention (All)**: All submissions must provide reversible actions, real-time validation, or a confirmation review step.
+- **3.3.6 Context-Sensitive Help**: Provide helper text or accessible help popovers for every input field.

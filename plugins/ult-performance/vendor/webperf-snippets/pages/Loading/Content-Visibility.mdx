@@ -1,0 +1,239 @@
+import snippet from '../../snippets/Loading/Content-Visibility.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# Content Visibility
+
+Detect and analyze all elements using `content-visibility: auto` on a page. This CSS property is a powerful rendering optimization that allows browsers to skip layout and painting work for offscreen content, significantly improving initial page load performance.
+
+This page provides two complementary analysis functions:
+
+1. **`detectContentVisibility()`** - Finds all elements with `content-visibility: auto` and provides inspection tools
+2. **`analyzeContentVisibilityOpportunities(options)`** - Walks the DOM to find offscreen elements that could benefit from `content-visibility: auto`, with configurable thresholds for distance, height, and child count
+
+### Attribution
+
+This snippet code is based on the [script](https://github.com/corewebvitals/pagespeed/blob/main/code/inp/detect-content-visibility-auto.js) by [Arjen Karel](https://www.linkedin.com/posts/arjenkarel_corewebvitals-activity-7183071762769686529-owtr)
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+#### `detectContentVisibility()` Results
+
+This function scans the entire DOM for elements using `content-visibility` and provides:
+
+**Auto Elements (`content-visibility: auto`):**
+
+- **selector**: CSS selector path to the element
+- **contentVisibility**: The current value (`auto`)
+- **containIntrinsicSize**: The placeholder size for layout calculations
+- **width/height**: Current dimensions of the element
+- **top**: Distance from the top of the document
+- **inViewport**: Whether the element is currently visible
+
+**Hidden Elements (`content-visibility: hidden`):**
+
+- Elements completely hidden from rendering
+- Useful for off-canvas menus, modals, or pre-rendered content
+
+**Warnings:**
+
+- Missing `contain-intrinsic-size` warnings help prevent Cumulative Layout Shift (CLS)
+- Suggests appropriate height values based on current element dimensions
+
+#### `analyzeContentVisibilityOpportunities(options)` Results
+
+This function walks the entire DOM to find elements below the viewport that would benefit from `content-visibility: auto`.
+
+**Options (all optional):**
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `threshold` | `0` | Distance in px from viewport bottom. Use negative values (e.g., `-200`) to include elements closer to the fold |
+| `minHeight` | `100` | Minimum element height in px to be considered |
+| `minChildren` | `5` | Minimum number of child elements (filters out simple containers) |
+
+**Examples:**
+
+```js copy
+// Default settings
+analyzeContentVisibilityOpportunities()
+
+// More aggressive - find elements closer to viewport
+analyzeContentVisibilityOpportunities({ threshold: -200 })
+
+// Find smaller elements with fewer children
+analyzeContentVisibilityOpportunities({ minHeight: 50, minChildren: 3 })
+
+// Combine options
+analyzeContentVisibilityOpportunities({ threshold: -100, minHeight: 80, minChildren: 10 })
+```
+
+**Output fields:**
+
+- **selector**: Element identifier
+- **height**: Current height (use this for `contain-intrinsic-size`)
+- **distanceFromViewport**: How far below the viewport the element is
+- **childElements**: Number of descendant elements (more = higher impact)
+- **estimatedSavings**: Rough estimate of render time saved (Low/Medium/High)
+
+**Note:** The function automatically filters out nested elements - if a parent container is selected, its children won't appear separately in the results.
+
+### How content-visibility Works
+
+The `content-visibility` CSS property controls whether an element renders its contents:
+
+| Value     | Behavior                                                                             |
+| --------- | ------------------------------------------------------------------------------------ |
+| `visible` | Default. Content always rendered.                                                    |
+| `auto`    | Content rendered when near viewport. Browser skips rendering for offscreen elements. |
+| `hidden`  | Content never rendered (like `display: none` but preserves element state).           |
+
+When using `content-visibility: auto`:
+
+1. **Initial Load**: Offscreen elements are not rendered
+2. **Scroll**: Elements render as they approach the viewport
+3. **Memory**: Rendered content may be discarded when scrolling away
+
+### Important: contain-intrinsic-size
+
+Always pair `content-visibility: auto` with `contain-intrinsic-size` to prevent layout shifts:
+
+```css copy
+.offscreen-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+```
+
+**Understanding the value:**
+
+The `contain-intrinsic-size` property tells the browser what size to use for the element before its content is rendered. This is critical because without it, offscreen elements would have zero height, causing massive layout shifts when they render.
+
+- **`auto`**: Tells the browser to remember the actual rendered size after the first render. On subsequent navigations or when scrolling back, it uses the cached size instead of the placeholder.
+- **`500px`** (or any height value): **The estimated height of your content**. This should approximate the actual rendered height of the element.
+
+**How to choose the right height value:**
+
+1. **Measure the actual element**: Use DevTools to inspect the element's rendered height, or use the `analyzeContentVisibilityOpportunities()` function which reports element heights
+2. **Use an average**: For dynamic content (like comments or cards), use an average expected height
+3. **Err on the side of larger**: A slightly larger estimate is better than too small, it reduces the chance of noticeable layout shifts
+4. **It doesn't need to be exact**: The browser will adjust once content renders, this is just a placeholder to reserve space
+
+**Example values by content type:**
+
+| Content Type         | Typical Height |
+| -------------------- | -------------- |
+| Footer               | 200-400px      |
+| Comments section     | 600-1000px     |
+| Product card         | 300-450px      |
+| Blog article section | 400-800px      |
+| Sidebar widget       | 200-350px      |
+
+### Performance Impact
+
+**Potential Benefits:**
+
+- **Faster Initial Render**: Browser skips layout/paint for offscreen content
+- **Reduced Main Thread Work**: Less JavaScript style recalculation
+- **Lower Memory Usage**: Offscreen content not in render tree
+- **Improved INP**: Less work during scrolling interactions
+
+**Typical Savings:**
+
+| Scenario                              | Estimated Improvement |
+| ------------------------------------- | --------------------- |
+| Long blog post with comments          | 100-300ms render time |
+| E-commerce product grid (50+ items)   | 200-500ms render time |
+| Documentation page with many sections | 150-400ms render time |
+| Social feed with infinite scroll      | 300-800ms render time |
+
+### Best Practices
+
+**Good Candidates for `content-visibility: auto`:**
+
+- Footer sections
+- Below-the-fold content sections
+- Long lists or card grids
+- Comments sections
+- Related content / recommendations
+- Tab panels (non-active)
+- Accordion/collapsible content
+- Infinite scroll items
+
+**Avoid Using On:**
+
+- Above-the-fold content (defeats the purpose)
+- Elements with animations that need immediate rendering
+- Content that affects layout calculations above it
+- Very small elements (overhead not worth it)
+
+### Browser Support
+
+`content-visibility` is supported in:
+
+- Chrome 85+
+- Edge 85+
+- Opera 71+
+- Chrome for Android 85+
+
+Not yet supported in Firefox and Safari (as of 2024), but these browsers simply ignore the property, so it's safe to use as a progressive enhancement.
+
+### Implementation Examples
+
+**Basic Usage:**
+
+```css copy
+/* Apply to sections below the fold */
+.content-section:not(:first-child) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
+}
+```
+
+**Footer Optimization:**
+
+```css copy
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+```
+
+**Card Grid Optimization:**
+
+```css copy
+/* Skip rendering for cards far from viewport */
+.product-card:nth-child(n + 5) {
+  content-visibility: auto;
+  contain-intrinsic-size: 280px 350px;
+}
+```
+
+**Comments Section:**
+
+```css copy
+.comments-container {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
+```
+
+### Further Reading
+
+For an in-depth understanding of `content-visibility` and rendering optimization:
+
+- [content-visibility: the new CSS property that boosts your rendering performance](https://web.dev/articles/content-visibility) | web.dev
+- [CSS Containment](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment) | MDN Web Docs
+- [content-visibility on MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/content-visibility) | Complete reference
+- [Improve Largest Contentful Paint with content-visibility](https://web.dev/articles/optimize-lcp#optimize_when_resources_are_loaded) | web.dev
+
+**Real-world Example:**
+
+- [Add content-visibility to NoteButton component](https://github.com/nucliweb/react-workshop-fwdays-mar24/pull/2) | A practical PR showing before/after DevTools screenshots of layout and layers improvements when applying `content-visibility` to a React component
+
+### Note
+
+_This snippet analyzes computed styles, so it will detect `content-visibility` applied through any method (inline styles, stylesheets, or JavaScript). The analysis runs synchronously and may take a moment on pages with many elements._

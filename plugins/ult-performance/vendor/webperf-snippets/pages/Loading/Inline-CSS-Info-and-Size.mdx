@@ -1,0 +1,79 @@
+import snippet from '../../snippets/Loading/Inline-CSS-Info-and-Size.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# Inline CSS Info and Size
+
+Analyzes all inline `<style>` tags on the page, measuring their size and identifying optimization opportunities. This helps understand how much CSS is inlined and whether it's being used effectively.
+
+**When inline CSS is good:**
+
+| Scenario | Benefit |
+|----------|---------|
+| **Critical CSS** (< 14 KB) | Eliminates render-blocking request, faster FCP |
+| **Above-the-fold styles** | Immediate rendering without waiting for external CSS |
+| **Single-page apps** | Reduces HTTP requests for small style chunks |
+
+**When inline CSS is problematic:**
+
+| Issue | Impact | Threshold |
+|-------|--------|-----------|
+| **Too large** | Bloats HTML, slower TTFB | > 14 KB (TCP slow start) |
+| **Duplicated** | Wasted bytes, harder maintenance | Same styles in multiple `<style>` tags |
+| **Not critical** | Delays HTML parsing | Styles for below-the-fold content |
+| **Uncached** | Re-downloaded on every page | Large styles that could be external |
+
+> **14 KB Rule:** The first TCP round-trip can deliver ~14 KB. Critical CSS should fit within this budget for optimal First Contentful Paint.
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+**Summary Section:**
+- Total inline style tags and combined size
+- Approximate CSS rule count
+- Percentage of 14 KB critical budget used
+- Visual budget bar
+
+**Details Table:**
+
+| Column | Description |
+|--------|-------------|
+| # | Style tag index |
+| Location | Whether in `<head>` or `<body>` |
+| Size | Byte size of the CSS content |
+| Rules | Approximate number of CSS rules |
+| Media Queries | Contains `@media` rules |
+| Animations | Contains `@keyframes` |
+| Preview | First 80 characters of CSS |
+
+**Issues Detected:**
+
+| Issue | Why It Matters |
+|-------|----------------|
+| Total size > 14 KB | Exceeds TCP slow start budget, delays FCP |
+| Duplicate blocks | Wasted bytes, maintenance burden |
+| Large blocks (> 5 KB) | Could benefit from external caching |
+| Styles in `<body>` | May cause reflows during parsing |
+
+### The 14 KB Rule
+
+The first TCP round-trip delivers approximately 14 KB of data. For optimal performance:
+
+```
+┌─────────────────────────────────────────────┐
+│  First 14 KB (one round-trip)               │
+│  ┌───────────────────────────────────────┐  │
+│  │ HTML + Critical CSS + Critical JS     │  │
+│  │ → Enough to render above-the-fold     │  │
+│  └───────────────────────────────────────┘  │
+└─────────────────────────────────────────────┘
+```
+
+### Further Reading
+
+- [Extract critical CSS](https://web.dev/articles/extract-critical-css) | web.dev
+- [Defer non-critical CSS](https://web.dev/articles/defer-non-critical-css) | web.dev
+- [Reduce the scope of style calculations](https://web.dev/articles/reduce-the-scope-and-complexity-of-style-calculations) | web.dev
+- [Critical rendering path](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path) | MDN

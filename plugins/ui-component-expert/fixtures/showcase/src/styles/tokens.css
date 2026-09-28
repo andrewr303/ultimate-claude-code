@@ -1,0 +1,101 @@
+/*
+ * Semantic design tokens — one warm-neutral ramp, one ink-blue accent ramp,
+ * and only the status hues the product actually renders. Dark mode swaps the
+ * same role names via a single mechanism: [data-theme="dark"] on <html>.
+ *
+ * Contrast notes: pairs below were verified with offline WCAG 2.x
+ * relative-luminance arithmetic (not by rendered measurement), targeting
+ * 4.5:1 for text and 3:1 for control boundaries and focus rings.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Type ------------------------------------------------------------------ */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 12px floor everywhere; 14–15px for UI and body. */
+  --fs-100: 12px;
+  --fs-200: 13px;
+  --fs-300: 14px;
+  --fs-400: 15px;
+  --fs-500: 18px;
+  --fs-600: 24px;
+  --fs-700: clamp(28px, 5vw, 40px);
+
+  /* Space ----------------------------------------------------------------- */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-s: 12px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 40px;
+
+  --measure: 68ch;
+
+  /* Shape and hit targets -------------------------------------------------- */
+  --radius-s: 2px;
+  --radius-m: 4px;
+  --control-min-h: 44px; /* every interactive control: ≥44px tall */
+
+  /* Surfaces and text (light) ---------------------------------------------- */
+  --surface-page: #f7f5f0;      /* warm paper; L≈0.91 */
+  --surface-raised: #fffdf8;    /* dialog, detail panel, fields */
+  --surface-inset: #ece8de;     /* hover wash, subtle fills */
+  --text-primary: #26221a;      /* 14.5:1 on page */
+  --text-secondary: #5f5847;    /* 6.5:1 on page */
+  --text-muted: #6f6650;        /* 5.2:1 on page — hints and captions */
+
+  /* Lines ------------------------------------------------------------------- */
+  --line-hairline: #d6cfc1;     /* row separators */
+  --line-strong: #26221a;       /* editorial heavy rules */
+  --line-control: #6f6650;      /* control borders: 5.2:1 vs page */
+
+  /* Accent — one ink-blue ramp for every interactive element ---------------- */
+  --accent-solid: #1c589c;      /* 6.6:1 as text on page */
+  --accent-strong: #164677;     /* hover: 9.4:1 vs --accent-ink */
+  --accent-press: #0f3a68;      /* active fill */
+  --accent-ink: #fffdf8;        /* text on accent fills */
+  --accent-wash: rgb(28 88 156 / 0.12); /* selected row, ::selection */
+
+  /* Status — only the meanings the queue renders ---------------------------- */
+  --status-danger: #96302a;     /* errors, urgent, escalated: 7.0:1 */
+  --status-ok: #2e6b46;         /* creation success: 5.8:1 */
+  --status-warn: #8a5a10;       /* on-hold, high priority: 5.4:1 */
+
+  --focus-ring: #1c589c;
+  --scrim: rgb(23 19 14 / 0.5);
+  --shadow-dialog: 0 24px 48px -24px rgb(20 16 8 / 0.35), 0 4px 12px rgb(20 16 8 / 0.16);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface-page: #16130e;
+  --surface-raised: #211d16;
+  --surface-inset: #2b261d;
+  --text-primary: #ece7db;      /* 14.8:1 on page */
+  --text-secondary: #b3aa96;    /* 8.0:1 on page */
+  --text-muted: #948b77;        /* 5.5:1 on page */
+
+  --line-hairline: #3d372c;
+  --line-strong: #d9d2c2;       /* heavy rules stay light on dark surfaces */
+  --line-control: #8f8672;      /* 4.7:1 vs raised */
+
+  /* Same hue, lightened for dark surfaces; vividness reduced. */
+  --accent-solid: #7aa5dd;      /* 7.3:1 as text on page */
+  --accent-strong: #8db4e4;     /* hover: lighter, not darker */
+  --accent-press: #a2c3ec;
+  --accent-ink: #10131b;        /* 7.3:1 on --accent-solid */
+  --accent-wash: rgb(122 165 221 / 0.16);
+
+  --status-danger: #e0796e;     /* 6.3:1 */
+  --status-ok: #7fc29b;         /* 8.9:1 */
+  --status-warn: #d9a44a;       /* 8.3:1 */
+
+  --focus-ring: #9dbdec;
+  --scrim: rgb(8 6 4 / 0.55);
+  --shadow-dialog: 0 24px 48px -24px rgb(0 0 0 / 0.65), 0 4px 12px rgb(0 0 0 / 0.4);
+}

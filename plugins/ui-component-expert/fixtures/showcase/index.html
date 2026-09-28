@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Review queue — operations fixture</title>
+    <meta
+      name="description"
+      content="Synthetic review-queue operations workspace: an isolated React + TypeScript + CSS reference fixture."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%231c589c'/%3E%3Crect x='3' y='4' width='10' height='1.5' fill='%23f7f5f0'/%3E%3Crect x='3' y='7.25' width='10' height='1.5' fill='%23f7f5f0'/%3E%3Crect x='3' y='10.5' width='6' height='1.5' fill='%23f7f5f0'/%3E%3C/svg%3E"
+    />
+    <script>
+      // Pre-paint theme bootstrap: honor the system preference once; the
+      // in-app toggle owns data-theme afterwards. Single switching mechanism.
+      (function () {
+        var dark =
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

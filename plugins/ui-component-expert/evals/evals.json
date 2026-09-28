@@ -1,0 +1,132 @@
+{
+  "version": "1.0.0",
+  "name": "ui-component-expert-evaluation-specifications",
+  "description": "Deterministic evaluation specification catalog and safety assertions for ui-component-expert packaging, contract schemas, boundary enforcement, and integration safety. Engine unit/integration tests are maintained separately under tests/*.test.mjs; specification items below document verifiable invariants with execution status.",
+  "executionSummary": {
+    "totalSpecifications": 15,
+    "status": "NOT_EVALUATED",
+    "note": "Specifications represent normative behavioral contracts. Automated runner tests are executed by the core test suite (npm test) or manual verification passes. Declarative assertions must not be reported as passed without direct tool execution."
+  },
+  "specifications": [
+    {
+      "id": "SPEC-SOURCE-COVERAGE-01",
+      "category": "sourcecoverage",
+      "status": "NOT_EVALUATED",
+      "title": "All nine source repositories cataloged and verified with exact upstream licenses",
+      "expectedBehavior": "references/source-provenance.json catalogs all 9 upstream sources with accurate relative paths, SHA256 checksums, and exact license text from source LICENSE files without fabricated URLs or licenses.",
+      "testProcedure": "Verify that references/source-provenance.json lists all 9 sources and that licenses match upstream LICENSE files (MIT for 8, Apache-2.0 for react-spectrum-main)."
+    },
+    {
+      "id": "SPEC-SOURCE-DEDUP-02",
+      "category": "sourcecoverage",
+      "status": "NOT_EVALUATED",
+      "title": "SKILL (18).md deduplication against design-component skill",
+      "expectedBehavior": "Root SKILL (18).md has SHA256 e35325764a67028e7a92585303dbcd0ee90894933bdf92989e907c2041eb8fd6, identical to ux-ui-agent-skills-main/.claude/skills/design-component/SKILL.md, and is marked DEDUPLICATED in source-provenance.json while preserved intact on disk.",
+      "testProcedure": "Compute SHA256 of SKILL (18).md and verify equality with ux-ui-agent-skills-main/.claude/skills/design-component/SKILL.md."
+    },
+    {
+      "id": "SPEC-CONTRACT-TOKEN-CYCLE-03",
+      "category": "contract",
+      "status": "NOT_EVALUATED",
+      "title": "Circular token alias detection and rejection",
+      "expectedBehavior": "validateContract detects and rejects direct circular aliases (A -> B -> A) and multi-tier cycles (primitive -> semantic -> component -> primitive).",
+      "testProcedure": "Pass contract object with cyclic token references to validateContract and verify that validation fails with a cycle error."
+    },
+    {
+      "id": "SPEC-CONTRACT-8STATES-04",
+      "category": "contract",
+      "status": "NOT_EVALUATED",
+      "title": "Mandatory 8-state coverage with justified non-empty reason",
+      "expectedBehavior": "Components in DesignContract define all 8 canonical states (default, hover, focus, active, disabled, loading, error, selected). Applicable states provide values; non-applicable states provide applicable: false and a non-empty reason.",
+      "testProcedure": "Validate contract missing one state or missing reason for non-applicable state; assert that validateContract rejects the contract."
+    },
+    {
+      "id": "SPEC-INJECTION-UNC-PATH-05",
+      "category": "injection",
+      "status": "NOT_EVALUATED",
+      "title": "Rejection of Windows UNC network paths in ingest CLI",
+      "expectedBehavior": "ingest-export rejects UNC network paths (e.g. \\\\remote\\share\\file) with code INVALID_PATH or UNSAFE_PATH, preventing remote network traversal.",
+      "testProcedure": "Invoke ingest CLI with input pointing to a UNC path; verify that process exits non-zero with appropriate error code."
+    },
+    {
+      "id": "SPEC-INJECTION-TRAVERSAL-06",
+      "category": "injection",
+      "status": "NOT_EVALUATED",
+      "title": "Rejection of path traversal sequences in ingest CLI",
+      "expectedBehavior": "ingest-export rejects path traversal sequences (e.g. ../../Windows/System32 or ..\\secret) with code INVALID_PATH or UNSAFE_PATH.",
+      "testProcedure": "Invoke ingest CLI with path traversal input; verify that process exits non-zero without accessing target."
+    },
+    {
+      "id": "SPEC-INJECTION-ZIPSLIP-07",
+      "category": "injection",
+      "status": "NOT_EVALUATED",
+      "title": "Zip-Slip directory traversal defense during archive extraction",
+      "expectedBehavior": "Archive extraction verifies canonical destination path for each entry, rejecting any entry attempting to escape quarantine with ../ or absolute paths.",
+      "testProcedure": "Extract archive containing traversal entries; verify extraction aborts without writing outside quarantine."
+    },
+    {
+      "id": "SPEC-INJECTION-BYTE-QUARANTINE-08",
+      "category": "injection",
+      "status": "NOT_EVALUATED",
+      "title": "Byte-preserving quarantine and static inspection without executable preview",
+      "expectedBehavior": "Downloaded design export is preserved byte-identically in quarantine and inspected statically. Raw export HTML/SVG is never executed, sandboxed, or previewed in iframes, and never copied into target codebases.",
+      "testProcedure": "Inspect quarantine directory after ingestion; confirm files are preserved unmodified with SHA256 recorded in receipt.json."
+    },
+    {
+      "id": "SPEC-HEADLESS-SELECTION-09",
+      "category": "headless-selection",
+      "status": "NOT_EVALUATED",
+      "title": "Single primitive engine invariant per composite widget",
+      "expectedBehavior": "Each composite interactive component assigns exactly one headless behavioral primitive engine (Base UI, React Aria, Zag.js, or Native HTML). Multiple headless engines are never mixed in one composite control.",
+      "testProcedure": "Inspect generated component build worklist and assert that composite widgets declare a single primitive backend."
+    },
+    {
+      "id": "SPEC-REACT18-FORWARDREF-10",
+      "category": "react18",
+      "status": "NOT_EVALUATED",
+      "title": "React 18 component forwardRef with exact DOM element types",
+      "expectedBehavior": "When targeting React 18, Claude Code authors components using React.forwardRef<ExactElementType, Props> with exact underlying DOM elements (e.g. HTMLButtonElement), never generic HTMLElement or any.",
+      "testProcedure": "Inspect generated React 18 component signatures; verify exact DOM element type in forwardRef generic arguments."
+    },
+    {
+      "id": "SPEC-REACT19-DIRECTREF-11",
+      "category": "react19",
+      "status": "NOT_EVALUATED",
+      "title": "React 19 component ref passing as direct prop",
+      "expectedBehavior": "When targeting React 19+, Claude Code authors functional components passing ref directly in props without forwardRef wrapping.",
+      "testProcedure": "Inspect generated React 19 component signatures; verify absence of forwardRef and presence of direct ref prop."
+    },
+    {
+      "id": "SPEC-NEXT-APP-ROUTER-12",
+      "category": "next",
+      "status": "NOT_EVALUATED",
+      "title": "Next.js App Router client directive boundary and SSR hydration safety",
+      "expectedBehavior": "'use client' is placed strictly at interactive leaf components; zero top-level references to window or document occur during SSR module evaluation; useId() is used for ARIA IDs.",
+      "testProcedure": "Statically inspect generated components for leaf use client placement and verify absence of top-level window/document references."
+    },
+    {
+      "id": "SPEC-HUMANEDIT-PREFLIGHT-13",
+      "category": "humanedit",
+      "status": "NOT_EVALUATED",
+      "title": "Additions-only preflight refuses any pre-existing destination file",
+      "expectedBehavior": "integrate-target checks destination paths and strictly halts if ANY destination file already exists, ensuring existing human-edited files are never overwritten.",
+      "testProcedure": "Run integrate-target against a target directory containing a pre-existing destination file; verify that integration halts with an error."
+    },
+    {
+      "id": "SPEC-HUMANEDIT-ROLLBACK-14",
+      "category": "humanedit",
+      "status": "NOT_EVALUATED",
+      "title": "Rollback deletes only hashguarded created files recorded in journal",
+      "expectedBehavior": "integrate-target --rollback --apply deletes only the files cataloged as created in the transaction journal upon explicit user instruction.",
+      "testProcedure": "Execute integration apply, then execute rollback --apply; verify that created files are cleanly deleted while all other target files remain untouched."
+    },
+    {
+      "id": "SPEC-BROWSER-BLOCKED-GATE-15",
+      "category": "verification-gate",
+      "status": "NOT_EVALUATED",
+      "title": "BrowserOS neo unavailability reports BLOCKED for visual and DOM axe checks",
+      "expectedBehavior": "run-verification reports BLOCKED when BrowserOS neo is unavailable for visual rendering and DOM-based axe audits. Never silently falls back to headless Chrome or Playwright; static code checks are not accepted as proof of accessibility.",
+      "testProcedure": "Run verification with BrowserOS runtime disconnected; verify that visual and DOM accessibility checks report status BLOCKED."
+    }
+  ]
+}

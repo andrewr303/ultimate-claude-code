@@ -1,0 +1,128 @@
+import snippet from "../../snippets/Loading/Resource-Hints-Validation.js?raw";
+import { Snippet } from "../../components/Snippet";
+
+# Resource Hints Validation
+
+### Overview
+
+Validates resource hints (preload, preconnect, dns-prefetch) by analyzing which hints are declared and whether the resources or connections are actually used. Detects unused hints that waste browser resources and opportunities to optimize loading.
+
+**What are resource hints?**
+
+Resource hints tell the browser to perform actions that can improve loading performance:
+
+| Hint           | Purpose                                      | When to Use                      |
+| -------------- | -------------------------------------------- | -------------------------------- |
+| `preload`      | Load critical resources early, high priority | Current page critical resources  |
+| `preconnect`   | Establish connection (DNS + TCP + TLS)       | Critical third-party domains     |
+| `dns-prefetch` | Resolve DNS only                             | Non-critical third-party domains |
+
+**Problems commonly detected:**
+
+| Issue                   | Impact             | Detection                              |
+| ----------------------- | ------------------ | -------------------------------------- |
+| **Unused preload**      | Wasted bandwidth   | Preload declared but resource not used |
+| **Unused preconnect**   | Wasted CPU/network | Connection opened but domain not used  |
+| **Unused dns-prefetch** | Minimal waste      | DNS resolved but domain not used       |
+| **Missing preconnect**  | Opportunity loss   | Domain used but no preconnect hint     |
+
+### Important Notes
+
+**Timing**: Run this snippet after the page has fully loaded and all resources are in the Performance API. For best results:
+
+- Wait until `window.addEventListener('load', ...)` fires
+- Or wait a few seconds after initial page load
+- Resources like fonts may load asynchronously and won't appear immediately
+
+**Why timing matters**: The snippet compares declared hints against resources captured by `performance.getEntriesByType("resource")`. If resources haven't loaded yet when you run the snippet, they won't be detected as "used" even though they will load later.
+
+**Performance API Limitations**: Some resources may not appear in the Performance API even when they're loaded:
+
+- **Lazy-loaded images**: Images loaded via Intersection Observer or similar techniques may not be captured
+- **Service Worker cached resources**: Resources served from service worker cache might not be recorded
+- **Cross-origin restrictions**: Some third-party resources without `Timing-Allow-Origin` headers have limited visibility
+
+The snippet includes a check that compares DOM elements (like `<img>` tags) against Performance API data to detect these cases and warn you when domains have resources in the DOM but aren't captured by the Performance API.
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+**Summary Section:**
+
+Shows the overall state of resource hints:
+
+- Total number of each hint type (preload, preconnect, dns-prefetch)
+- Total resources loaded on the page
+- Number of unique domains accessed
+
+**Validation Categories:**
+
+1. **Preload Validation**
+   - Lists preloaded resources and checks if they were actually used
+   - Shows size and load time for used resources
+   - Identifies unused preloads that waste bandwidth
+   - Recognizes conditional preloads with `media` attributes (best practice for responsive images)
+
+2. **Preconnect Validation**
+   - Lists domains with preconnect hints
+   - Counts how many requests were made to each domain
+   - Identifies unused connections that waste CPU/network
+
+3. **DNS-Prefetch Validation**
+   - Lists domains with dns-prefetch hints
+   - Checks if domains were actually accessed
+   - Unused dns-prefetch has minimal impact
+
+4. **Optimization Opportunities**
+   - Identifies domains making multiple requests without hints
+   - Suggests adding preconnect or dns-prefetch based on request count
+   - Limited to top recommendations to avoid bandwidth competition
+
+### When to Use Each Hint
+
+| Hint           | Use Case                                            | Request Count           |
+| -------------- | --------------------------------------------------- | ----------------------- |
+| `preload`      | Critical same-origin resources (fonts, hero images) | Any                     |
+| `preconnect`   | Critical third-party domains (CDN)                  | 5+ requests recommended |
+| `dns-prefetch` | Non-critical third-party (analytics, ads)           | 2-4 requests            |
+
+### Real-World Examples
+
+**✅ Good: Proper resource hints**
+
+```html
+<!-- Preload critical resources -->
+<link rel="preload" href="/fonts/main.woff2" as="font" crossorigin />
+<link rel="preload" href="/hero-image.webp" as="image" />
+
+<!-- Conditional preload for responsive images -->
+<link rel="preload" href="/hero-mobile.webp" as="image" media="(max-width: 768px)" />
+<link rel="preload" href="/hero-desktop.webp" as="image" media="(min-width: 769px)" />
+
+<!-- Preconnect to critical CDN -->
+<link rel="preconnect" href="https://cdn.web.dev" />
+
+<!-- DNS-prefetch for analytics -->
+<link rel="dns-prefetch" href="https://analytics.web.dev" />
+```
+
+**❌ Bad: Unused hints**
+
+```html
+<!-- Preload for resource not used on this page -->
+<link rel="preload" href="/admin-panel.js" as="script" />
+
+<!-- Preconnect to domain never accessed -->
+<link rel="preconnect" href="https://unused-cdn.web.dev" />
+```
+
+### Further Reading
+
+- [Resource Hints](https://www.w3.org/TR/resource-hints/) | W3C Specification
+- [Preload critical assets](https://web.dev/articles/preload-critical-assets) | web.dev
+- [Establish network connections early](https://web.dev/articles/preconnect-and-dns-prefetch) | web.dev
+- [Resource Hints comparison](https://www.debugbear.com/blog/resource-hints-rel-preload-prefetch-preconnect) | DebugBear
+- [Optimize resource loading with the Fetch Priority API](https://web.dev/articles/fetch-priority) | web.dev

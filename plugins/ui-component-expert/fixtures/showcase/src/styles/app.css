@@ -1,0 +1,109 @@
+/* Application shell: skip link, masthead, stat line, sections, footer. */
+
+.skip-link {
+  position: fixed;
+  inset-block-start: 12px;
+  inset-inline-start: -9999px;
+  z-index: 10;
+  padding: 10px var(--space-m);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font: 600 var(--fs-300)/1.2 var(--font-sans);
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  inset-inline-start: 12px;
+}
+
+.workspace {
+  max-inline-size: 1160px;
+  margin-inline: auto;
+  padding-inline: clamp(12px, 4vw, 40px);
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-m) var(--space-l);
+  padding-block: var(--space-l) var(--space-m);
+  border-block-end: 2px solid var(--line-strong);
+}
+
+.masthead-title {
+  font: 400 var(--fs-700)/1.05 var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+.masthead-sub {
+  margin-block-start: 6px;
+  font: italic 400 var(--fs-300)/1.4 var(--font-serif);
+  color: var(--text-secondary);
+}
+
+.masthead-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+}
+
+.stat-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s) var(--space-l);
+  padding-block: var(--space-s);
+  border-block-end: 1px solid var(--line-hairline);
+  font: 400 var(--fs-200)/1.4 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.stat-line strong {
+  margin-inline-start: 4px;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Stable live region: rendered empty until something is announced. */
+.app-announcement {
+  margin-block: var(--space-s) 0;
+  font: 600 var(--fs-300)/1.5 var(--font-sans);
+  color: var(--status-ok);
+}
+
+.section {
+  margin-block-start: var(--space-xl);
+}
+
+.section-kicker {
+  margin-block-end: var(--space-m);
+  padding-block-end: var(--space-2xs);
+  border-block-end: 1px solid var(--line-hairline);
+  font: 700 var(--fs-100)/1.4 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.section-intro {
+  max-inline-size: var(--measure);
+  margin-block-end: var(--space-m);
+  font-size: var(--fs-300);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.page-foot {
+  margin-block: var(--space-xl) var(--space-l);
+  padding-block-start: var(--space-s);
+  border-block-start: 1px solid var(--line-hairline);
+  font-size: var(--fs-200);
+  color: var(--text-muted);
+}

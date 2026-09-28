@@ -1,0 +1,14 @@
+---
+description: Write persistent platform context or ingest a scoped context source
+argument-hint: "[surface, path, source, or catalog]"
+---
+
+# ultimate-sdd-context
+
+This dispatcher requires the full installed Ultimate SDD plugin root (`skills/`, `references/`, `templates/`, `scripts/`, and `commands/`); it is not a self-contained isolated prompt. Resolve `<plugin>` from installed host metadata or an explicit local installation path. If the installation is unavailable or incomplete, stop, report the missing installation, and request its location; never fall back to donor repositories or duplicated inline workflows.
+
+Resolve the installed full `<plugin>` root and the target `<repo>` / `<root>` via `references/model.md`. Run base `plan.py` commands with the target repository as cwd. Stop if required plugin files are unavailable.
+
+Read and follow `<plugin>/skills/plan-context/SKILL.md`, preserving its scope, authored context, and evidence boundaries.
+
+Input: $ARGUMENTS

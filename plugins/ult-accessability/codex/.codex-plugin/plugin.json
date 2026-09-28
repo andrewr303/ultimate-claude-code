@@ -1,0 +1,22 @@
+{
+  "name": "ult-accessability",
+  "version": "1.0.0",
+  "description": "Ultimate web accessibility plugin: WCAG 2.2 AA/AAA audits, contrast and color, remediation, testing, and before/after reports. Default entry routes the agent to the right skill.",
+  "author": {
+    "name": "Ult Accessability"
+  },
+  "license": "MIT",
+  "keywords": [
+    "accessibility",
+    "wcag",
+    "a11y",
+    "contrast",
+    "lighthouse"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ult Accessability",
+    "shortDescription": "WCAG 2.2 AA/AAA audits, contrast, remediation, and testing.",
+    "category": "Productivity"
+  }
+}

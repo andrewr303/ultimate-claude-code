@@ -1,0 +1,21 @@
+{
+  "name": "ult-accessability",
+  "interface": {
+    "displayName": "Ult Accessability"
+  },
+  "plugins": [
+    {
+      "name": "ult-accessability",
+      "description": "Ultimate web accessibility plugin: WCAG 2.2 AA/AAA audits, contrast and color, remediation, testing, and before/after reports.",
+      "source": {
+        "source": "local",
+        "path": "./codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

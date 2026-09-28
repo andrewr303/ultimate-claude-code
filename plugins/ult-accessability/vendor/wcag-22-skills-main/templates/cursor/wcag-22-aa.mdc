@@ -1,0 +1,104 @@
+---
+description: WCAG 2.2 Level AA accessibility standards, semantic HTML, ARIA patterns, contrast, keyboard navigation, and WCAG 2.2 criteria.
+globs: **/*.{html,htm,jsx,tsx,vue,svelte,astro,css,scss,less,js,ts}
+alwaysApply: false
+---
+
+# WCAG 2.2 Level AA Accessibility Standards
+
+You are an expert accessibility engineer enforcing **WCAG 2.2 Level AA** compliance across all frontend code, HTML structure, CSS stylesheets, and UI components. All generated, refactored, and reviewed code MUST adhere strictly to these rules.
+
+## 1. WCAG 2.2 Level A & AA Mandates (New Criteria)
+
+1. **2.4.11 Focus Not Obscured (Minimum) (AA)**:
+   - Ensure elements receiving keyboard focus are never entirely covered by sticky headers, sticky footers, or fixed floating elements.
+   - Always set `scroll-padding-top` on `html` and `scroll-margin-top` on focusable elements when using sticky navigation.
+   ```css
+   html {
+     scroll-padding-top: 5rem;
+     scroll-padding-bottom: 3rem;
+   }
+   :target, [tabindex]:focus, input:focus, button:focus, a:focus {
+     scroll-margin-top: 5.5rem;
+   }
+   ```
+
+2. **2.5.7 Dragging Movements (AA)**:
+   - Any drag-and-drop interaction (e.g., sortable lists, kanban boards, sliders) MUST have a single-pointer non-dragging alternative (e.g., "Move Up" / "Move Down" buttons or a dropdown action menu).
+
+3. **2.5.8 Target Size (Minimum) (AA)**:
+   - All interactive pointer targets (buttons, links, controls) must have a hit area of at least **24×24 CSS pixels**, or provide sufficient spacing to adjacent targets.
+   - If an icon is visually smaller than 24px (e.g., 16px), expand its clickable area using a pseudo-element (`::before` / `::after`).
+
+4. **3.2.6 Consistent Help (A)**:
+   - If help mechanisms (contact details, chat widget, contact form, FAQ links) appear on multiple pages, maintain their relative placement across all pages.
+
+5. **3.3.7 Redundant Entry (A)**:
+   - Avoid asking users to enter the same information twice in the same process or checkout funnel.
+   - Provide auto-population or selection mechanisms (e.g., "Billing address matches shipping").
+
+6. **3.3.8 Accessible Authentication (Minimum) (AA)**:
+   - Do NOT require cognitive function tests (memorizing passwords, solving puzzles, calculating equations).
+   - Allow password manager auto-fill and clipboard pasting into password/OTP fields (`onpaste` must NOT be blocked).
+   - Support WebAuthn / Passkeys and email magic links.
+
+7. **4.1.1 Parsing (Obsolete)**:
+   - Deprecated in WCAG 2.2. Focus instead on **4.1.2 Name, Role, Value**.
+
+---
+
+## 2. Core POUR Standards & Implementation Rules
+
+### Perceivable
+- **Semantic HTML**: Use `<header>`, `<nav>`, `<main>`, `<article>`, `<aside>`, `<footer>`, `<h1>`-`<h6>`, `<button>`, `<table>`. Never replace native interactive elements with styled `<div>` or `<span>` without ARIA roles and keyboard listeners.
+- **Images & Icons**:
+  - Informative images MUST have meaningful `alt="descriptive text"`.
+  - Purely decorative images MUST use `alt=""` and `aria-hidden="true"`.
+  - Icon-only buttons MUST have `aria-label="Action description"` or an accessible visually-hidden `<span class="sr-only">`.
+- **Color & Contrast**:
+  - Normal text (< 18pt / 24px): Minimum **4.5:1** contrast ratio against its background.
+  - Large text (≥ 18pt / 24px or ≥ 14pt / 18.66px bold): Minimum **3:1** contrast ratio.
+  - Non-text UI components & active states: Minimum **3:1** contrast ratio against adjacent colors.
+  - NEVER convey information through color alone (always combine color with icons, text, or underlines).
+- **Reflow (1.4.10)**: Content must reflow cleanly without two-dimensional horizontal scrolling down to 320 CSS pixels (400% zoom at 1280px).
+
+### Operable
+- **Keyboard Operability (2.1.1 & 2.1.2)**:
+  - All interactive elements must be reachable via `Tab` and activate on `Enter` or `Space`.
+  - No keyboard traps. `Esc` must dismiss dialogs, dropdowns, and flyouts.
+- **Focus Visibility (2.4.7)**:
+  - NEVER use `outline: none` or `outline: 0` without providing an equal or better high-contrast focus replacement.
+  - Recommended focus styling:
+    ```css
+    :focus-visible {
+      outline: 2px solid #005fcc;
+      outline-offset: 2px;
+    }
+    ```
+- **Skip Links (2.4.1)**: Always include a top-level skip link:
+  ```html
+  <a href="#main-content" class="sr-only focus:not-sr-only">Skip to main content</a>
+  ```
+
+### Understandable
+- **Form Labels & Errors**:
+  - Every form control MUST have an associated `<label for="inputId">`.
+  - Form validation errors MUST use `aria-invalid="true"` and link error messages via `aria-describedby="errorId"`.
+  - Error messages must be clear, describe what went wrong, and provide suggestions for correction.
+
+### Robust
+- **ARIA & Dynamic States**:
+  - Use `aria-expanded="true|false"` for dropdowns and accordions.
+  - Use `aria-haspopup="dialog|menu"` where appropriate.
+  - Use `aria-live="polite"` for non-critical status updates and `aria-live="assertive"` for errors.
+  - Modals MUST use `role="dialog"`, `aria-modal="true"`, trap focus within the dialog, and restore focus to the trigger element upon closing.
+
+---
+
+## 3. Verification & Code Review Checklist
+When writing or reviewing code, always verify:
+1. Can every action be performed using keyboard alone?
+2. Does axe-core report zero violations (`@axe-core/playwright` or `@axe-core/react`)?
+3. Are touch/pointer targets at least 24×24px?
+4. Is sticky navigation configured so focus is never obscured?
+5. Are inputs labeled, error states linked with `aria-describedby`, and paste enabled?

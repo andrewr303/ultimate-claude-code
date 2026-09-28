@@ -1,0 +1,113 @@
+import snippet from '../../snippets/CoreWebVitals/LCP-Subparts.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# LCP Subparts
+
+### Overview
+
+Breaks down [Largest Contentful Paint](https://web.dev/articles/lcp) into its four phases to identify optimization opportunities. Understanding which phase is slowest helps you focus your optimization efforts where they'll have the most impact. Based on the [Web Vitals Chrome Extension](https://chrome.google.com/webstore/detail/web-vitals/ahfhijdlegdabablpippeagghigmibma).
+
+**Why this matters:**
+
+LCP is a critical Core Web Vital that measures when the largest content element becomes visible. By breaking it into sub-parts, you can pinpoint exactly where delays occur and apply targeted optimizations instead of guessing.
+
+**The four phases of LCP:**
+
+```mermaid
+flowchart LR
+    A([Navigation<br/>Start]) --> B["⏱️ TTFB<br/><small>Server Response</small>"]
+    B --> C["⏳ Load Delay<br/><small>Resource Discovery</small>"]
+    C --> D["📥 Load Time<br/><small>Download Resource</small>"]
+    D --> E["🎨 Render Delay<br/><small>Paint Element</small>"]
+    E --> F([✅ LCP<br/>Complete])
+
+    style B fill:#FFE5E5,stroke:#FF4444,stroke-width:2px
+    style C fill:#FFF3E5,stroke:#FF8800,stroke-width:2px
+    style D fill:#FFFBE5,stroke:#FFBB00,stroke-width:2px
+    style E fill:#E5FFE5,stroke:#44AA44,stroke-width:2px
+    style F fill:#E5F2FF,stroke:#4488FF,stroke-width:3px
+```
+
+| Sub-part | What it measures | Common causes |
+|----------|------------------|---------------|
+| **Time to First Byte** | Server response time | Slow server, no CDN, no caching |
+| **Resource Load Delay** | Time from TTFB until LCP resource starts loading | Render-blocking resources, late discovery |
+| **Resource Load Time** | Time to download the LCP resource | Large images, slow connection, no compression |
+| **Element Render Delay** | Time from download complete to paint | Client-side rendering, render-blocking JS |
+
+**Optimization priority:**
+
+| Phase | Target | How to optimize |
+|-------|--------|-----------------|
+| TTFB | < 800ms | Use CDN, optimize server, enable caching |
+| Load Delay | < 10% of LCP | Preload LCP image, remove render-blocking resources |
+| Load Time | < 40% of LCP | Compress images, use modern formats (WebP, AVIF) |
+| Render Delay | < 10% of LCP | Inline critical CSS, defer non-critical JS |
+
+> **Quick check:** Use [LCP](/CoreWebVitals/LCP) for a simple LCP value and element identification.
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+**Sub-Parts Table:**
+
+| Column | Description |
+|--------|-------------|
+| Sub-part | Phase name (⚠️ marks the slowest) |
+| Time | Duration in milliseconds |
+| % | Percentage of total LCP |
+| Status | ✅ OK or 🔴 Over target |
+
+**Visual Bar:**
+
+Shows time distribution across the four phases:
+- █ TTFB (server response)
+- ▓ Load Delay (discovery to request)
+- ▒ Load Time (download)
+- ░ Render Delay (paint)
+
+**Performance Timeline:**
+
+The snippet adds measures to the Performance API. To see them:
+1. Open DevTools → Performance tab
+2. Reload the page
+3. Look for "Time to First Byte", "Resource Load Delay", etc. in the timeline
+
+### Optimization Checklist
+
+| If slowest is... | Check these |
+|------------------|-------------|
+| **TTFB** | Server response time, CDN, caching headers |
+| **Load Delay** | Preload hints, render-blocking resources, late `<img>` in HTML |
+| **Load Time** | Image size, format, compression, CDN |
+| **Render Delay** | JavaScript blocking, CSS parsing, client-side rendering |
+
+**Optimization Decision Tree:**
+
+```mermaid
+flowchart TD
+    Start[Identify Slowest Phase] --> TTFB{TTFB > 800ms?}
+    Start --> Delay{Load Delay > 10%?}
+    Start --> Load{Load Time > 40%?}
+    Start --> Render{Render Delay > 10%?}
+
+    TTFB -->|Yes| TTFB_Fix["✓ Use CDN<br/>✓ Enable caching<br/>✓ Optimize server"]
+    Delay -->|Yes| Delay_Fix["✓ Preload LCP image<br/>✓ Remove render-blocking<br/>✓ Inline critical CSS"]
+    Load -->|Yes| Load_Fix["✓ Compress images<br/>✓ Use WebP/AVIF<br/>✓ Use responsive images"]
+    Render -->|Yes| Render_Fix["✓ Defer non-critical JS<br/>✓ Avoid client-side rendering<br/>✓ Use fetchpriority=high"]
+
+    style TTFB_Fix fill:#FFE5E5
+    style Delay_Fix fill:#FFF3E5
+    style Load_Fix fill:#FFFBE5
+    style Render_Fix fill:#E5FFE5
+```
+
+### Further Reading
+
+- [Optimize LCP](https://web.dev/articles/optimize-lcp) | web.dev
+- [LCP breakdown](https://web.dev/articles/optimize-lcp#lcp-breakdown) | web.dev
+- [Preload critical assets](https://web.dev/articles/preload-critical-assets) | web.dev
+- [LCP Quick Check](/CoreWebVitals/LCP) | Simple LCP measurement

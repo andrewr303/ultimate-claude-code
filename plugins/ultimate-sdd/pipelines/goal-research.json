@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "name": "goal-research",
+  "description": "Research-only iteration until an evidence-backed brief answers the question. Implementation requires a separate scoped and verified delivery workflow.",
+  "stages": [
+    {"id": "define-goal", "skill": "plan-goal", "role": "planner", "requires": [], "gate": "vet"},
+    {"id": "iterate", "skill": "plan-goal", "role": "implementer", "requires": ["define-goal"], "loop": {"kind": "goal", "gate": {"kind": "research"}}},
+    {"id": "retain", "skill": "plan-retain", "role": "reviewer", "requires": ["iterate"]}
+  ]
+}

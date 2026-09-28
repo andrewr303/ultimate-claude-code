@@ -1,0 +1,58 @@
+---
+type: guide
+---
+
+# Get your `<head>` in order
+
+How you order elements in the `<head>` can have an effect on the (perceived) performance of the page. The order of elements matters because the browser processes them sequentially.
+
+**Recommended `<head>` element order:**
+
+| Priority | Element | Why |
+|----------|---------|-----|
+| 1 | `<meta charset>` | Must be in first 1024 bytes |
+| 2 | `<meta http-equiv>` | May affect parsing |
+| 3 | `<meta name="viewport">` | Needed before first paint |
+| 4 | `<title>` | Shown in browser tab early |
+| 5 | `<link rel="preconnect">` | Start connections early |
+| 6 | `<script async>` | Start download early |
+| 7 | `<style>` with `@import` | Blocks until imports loaded |
+| 8 | `<script>` (sync) | Blocks parsing |
+| 9 | `<link rel="stylesheet">` | Blocks rendering |
+| 10 | `<link rel="preload">` | Hints for current page |
+| 11 | `<script defer>` / `<script type="module">` | Execute after parsing |
+| 12 | `<link rel="prefetch">` / `<link rel="prerender">` | Hints for future navigation |
+| 13 | Everything else | Non-critical meta tags, etc. |
+
+### Capo.js
+
+The best tool to analyze your `<head>` order is [**capo.js**](https://github.com/rviscomi/capo.js) by [Rick Viscomi](https://twitter.com/rviscomi).
+
+**How to use:**
+
+1. **Chrome Extension (Recommended):** Install [Capo from Chrome Web Store](https://chrome.google.com/webstore/detail/capo-get-your-head-in-ord/ohabpnaccigjhkkebjofhpmebofgpbeb)
+
+2. **Bookmarklet:** Create a bookmark with this URL:
+```
+javascript:(async()=>{const s=document.createElement('script');s.src='https://unpkg.com/@nicholasray/capo.js/dist/snippet.js';document.head.appendChild(s);})();
+```
+
+3. **NPM Package:** For programmatic use:
+```bash
+npm install @nicholasray/capo.js
+```
+
+**What capo.js shows:**
+
+- Visual color-coded representation of your `<head>` order
+- Actual vs optimal (sorted) element order
+- Validation warnings for invalid elements
+- Detailed element-by-element breakdown
+
+> **Note:** For the most up-to-date version, always refer to the [official capo.js repository](https://github.com/rviscomi/capo.js).
+
+### Further Reading
+
+- [capo.js GitHub Repository](https://github.com/rviscomi/capo.js) | Rick Viscomi
+- [ct.css - HEAD element order](https://csswizardry.com/ct/) | Harry Roberts
+- [Get your head straight](https://speakerdeck.com/csswizardry/get-your-head-straight) | Harry Roberts

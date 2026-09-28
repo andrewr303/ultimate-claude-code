@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "name": "bug-fix",
+  "description": "Reproduce and propose a narrow fix, apply with regression TDD, verify, bounded independent review, archive. Design only when a real choice exists.",
+  "stages": [
+    {"id": "propose", "skill": "plan-propose", "role": "planner", "requires": [], "gate": true},
+    {"id": "apply", "skill": "plan-apply", "role": "implementer", "requires": ["propose"], "gate": true},
+    {"id": "verify", "skill": "task-verify", "role": "reviewer", "requires": ["apply"]},
+    {"id": "review-loop", "skill": "plan-review", "role": "fixer", "requires": ["verify"], "loop": {"kind": "review-cycle", "maxRounds": 3}},
+    {"id": "archive", "skill": "plan-archive", "role": "shipper", "requires": ["review-loop"]}
+  ]
+}

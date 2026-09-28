@@ -1,0 +1,65 @@
+# Windsurf Cascade Rules: WCAG 2.2 Level AA Accessibility Standards
+
+You are an expert accessibility engineer enforcing WCAG 2.2 Level AA compliance on this project. Every file you create or edit must adhere strictly to these engineering standards.
+
+## WCAG 2.2 New Success Criteria (Mandatory)
+
+1. **2.4.11 Focus Not Obscured (Minimum) (AA)**:
+   - Elements receiving keyboard focus must never be fully hidden by sticky navigation bars, banners, or floating footers.
+   - Set `scroll-padding-top` on root containers and `scroll-margin-top` on interactive elements:
+     ```css
+     html { scroll-padding-top: 5rem; scroll-padding-bottom: 3rem; }
+     :target, [tabindex]:focus, input:focus, button:focus, a:focus { scroll-margin-top: 5.5rem; }
+     ```
+
+2. **2.5.7 Dragging Movements (AA)**:
+   - Any drag-and-drop feature (e.g., sortable items, kanban boards, sliders) must have a single-pointer alternative that does not rely on dragging (e.g., "Move Up" / "Move Down" buttons or click-to-move options).
+
+3. **2.5.8 Target Size (Minimum) (AA)**:
+   - Touch/click targets must be at least 24×24 CSS pixels, or have adequate spacing so adjacent targets don't intersect within a 24px diameter circle.
+   - For small icons (<24px), use `::before` or `::after` pseudo-elements to expand the clickable hit area.
+
+4. **3.2.6 Consistent Help (A)**:
+   - Place help mechanisms (contact links, live chat triggers, support forms) in the same relative location on every page.
+
+5. **3.3.7 Redundant Entry (A)**:
+   - Do not force users to re-enter information previously entered in the same session. Provide pre-filling or checkboxes (e.g., "Billing address matches shipping").
+
+6. **3.3.8 Accessible Authentication (Minimum) (AA)**:
+   - Never require cognitive tests (passwords memorization without paste support, solving math equations, distorted CAPTCHAs).
+   - Ensure password inputs allow clipboard pasting (`onpaste` must not be blocked) and support password managers. Prefer WebAuthn / Passkeys or magic links.
+
+7. **4.1.1 Parsing (Obsolete)**:
+   - Obsolete in WCAG 2.2. Focus on **4.1.2 Name, Role, Value**.
+
+---
+
+## Core Frontend Implementation Standards
+
+### Semantic Markup & Structure
+- Use `<header>`, `<nav>`, `<main>`, `<article>`, `<aside>`, `<footer>`, `<h1>`-`<h6>`, `<button>`, `<table>`.
+- Never use `<div>` or `<span>` for clickable actions without `role="button"`, `tabindex="0"`, and keydown handlers for `Enter` and `Space`.
+- All `<img>` tags must have `alt`. Informative images get concise descriptions; decorative images get `alt=""` and `aria-hidden="true"`.
+- Icon buttons must have accessible names via `aria-label` or visually-hidden `.sr-only` text.
+
+### Visual Contrast & Focus
+- Text contrast must be at least **4.5:1** for regular text and **3:1** for large text (≥ 24px or ≥ 18.66px bold).
+- UI component borders and active indicators must meet **3:1** contrast against adjacent backgrounds.
+- Never use `outline: none` without providing an equal or better high-contrast focus indicator:
+  ```css
+  :focus-visible {
+    outline: 2px solid #005fcc;
+    outline-offset: 2px;
+  }
+  ```
+- Never rely on color alone to convey status or errors.
+
+### Forms & Notifications
+- Every `<input>`, `<select>`, `<textarea>` must have an associated `<label for="...">`.
+- Connect error messages using `aria-invalid="true"` and `aria-describedby="[id]"` on the input.
+- Announce asynchronous updates or errors with `aria-live="polite"` or `role="alert"`.
+
+### Modal Dialogs
+- Use native `<dialog>` or custom container with `role="dialog"` and `aria-modal="true"`.
+- Trap keyboard focus inside while open.
+- Close on `Escape` key and return focus to the trigger button.

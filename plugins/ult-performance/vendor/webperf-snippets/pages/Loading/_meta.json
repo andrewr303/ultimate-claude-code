@@ -1,0 +1,86 @@
+{
+  "TTFB": {
+    "title": "TTFB"
+  },
+  "FCP": {
+    "title": "FCP"
+  },
+  "Client-Side-Redirect-Detection": {
+    "title": "Client-Side Redirect Detection"
+  },
+  "Back-Forward-Cache": {
+    "title": "Back/Forward Cache (bfcache)"
+  },
+  "JS-Execution-Time-Breakdown": {
+    "title": "JS Execution Time Breakdown"
+  },
+  "Event-Processing-Time": {
+    "title": "Event Processing Time"
+  },
+  "Script-Loading": {
+    "title": "Scripts Loading"
+  },
+  "First-And-Third-Party-Script-Info": {
+    "title": "First And Third Party Script Info"
+  },
+  "First-And-Third-Party-Script-Timings": {
+    "title": "First And Third Party Script Timings"
+  },
+  "Validate-Preload-Async-Defer-Scripts": {
+    "title": "Validate Preload on Async/Defer Scripts"
+  },
+  "Find-render-blocking-resources": {
+    "title": "Find render-blocking resources"
+  },
+  "Resource-Hints": {
+    "title": "Resource Hints"
+  },
+  "Resource-Hints-Validation": {
+    "title": "Resource Hints Validation"
+  },
+  "Prefetch-Resource-Validation": {
+    "title": "Prefetch Resource Validation"
+  },
+  "Priority-Hints-Audit": {
+    "title": "Priority Hints Audit"
+  },
+  "Find-Above-The-Fold-Lazy-Loaded-Images": {
+    "title": "Find Above The Fold Lazy Loaded Images"
+  },
+  "Find-Images-With-Lazy-and-Fetchpriority": {
+    "title": "Find Images With Loading Lazy and Fetchpriority"
+  },
+  "Find-non-Lazy-Loaded-Images-outside-of-the-viewport": {
+    "title": "Find non Lazy Loaded Images outside of the viewport"
+  },
+  "Fonts-Preloaded-Loaded-and-used-above-the-fold": {
+    "title": "Fonts Preloaded, Loaded, and Used Above The Fold"
+  },
+  "Content-Visibility": {
+    "title": "Content Visibility"
+  },
+  "Inline-CSS-Info-and-Size": {
+    "title": "Inline CSS Info and Size"
+  },
+  "Inline-Script-Info-and-Size": {
+    "title": "Inline Script Info and Size"
+  },
+  "CSS-Media-Queries-Analysis": {
+    "title": "CSS Media Queries Analysis"
+  },
+  "Critical-CSS-Detection": {
+    "title": "Critical CSS Detection"
+  },
+  "Get-Your-Head-in-Order": {
+    "title": "Get your <head> in order"
+  },
+  "SSR-Hydration-Data-Analysis": {
+    "title": "SSR Framework Hydration Data Analysis"
+  },
+  "Service-Worker-Analysis": {
+    "title": "Service Worker Analysis"
+  },
+  "Cache-Strategy-Analysis": {
+    "title": "Cache Strategy Analysis"
+  }
+}

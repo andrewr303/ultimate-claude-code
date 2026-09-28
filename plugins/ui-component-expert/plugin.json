@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ui-component-expert",
+  "version": "0.1.0",
+  "description": "Manual Claude Design export to reviewed React and TypeScript components, with explicit verification and integration gates."
+}

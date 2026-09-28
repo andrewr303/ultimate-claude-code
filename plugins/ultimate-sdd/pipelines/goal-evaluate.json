@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "name": "goal-evaluate",
+  "description": "Iterate until a rubric or quality bar passes.",
+  "stages": [
+    {"id": "define-goal", "skill": "plan-goal", "role": "planner", "requires": [], "gate": "vet"},
+    {"id": "iterate", "skill": "plan-goal", "role": "implementer", "requires": ["define-goal"], "loop": {"kind": "goal", "gate": {"kind": "evaluate"}}},
+    {"id": "verify", "skill": "task-verify", "role": "reviewer", "requires": ["iterate"]},
+    {"id": "review-loop", "skill": "plan-review", "role": "fixer", "requires": ["verify"], "loop": {"kind": "review-cycle", "maxRounds": 3}},
+    {"id": "retain", "skill": "plan-retain", "role": "reviewer", "requires": ["review-loop"]},
+    {"id": "archive", "skill": "plan-archive", "role": "shipper", "requires": ["retain"]}
+  ]
+}

@@ -1,0 +1,65 @@
+import snippet from '../../snippets/CoreWebVitals/LCP-Image-Entropy.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# LCP Image Entropy
+
+Checks if images qualify as LCP candidates based on their entropy (bits per pixel). Since [Chrome 112](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/speed/metrics_changelog/2023_04_lcp.md), low-entropy images are ignored for LCP measurement.
+
+Based on [Stoyan Stefanov's BPP check](https://www.phpied.com/quick-bpp-image-entropy-check/).
+
+**What is BPP (Bits Per Pixel)?**
+
+BPP measures image complexity/entropy:
+
+```
+BPP = (file size in bits) / (width × height)
+    = (encodedBodySize × 8) / (width × height)
+```
+
+**LCP eligibility threshold:**
+
+| BPP | Entropy | LCP Eligible | Example |
+|-----|---------|--------------|---------|
+| < 0.05 | 🔴 Low | ❌ No | Solid colors, simple gradients, placeholders |
+| ≥ 0.05 | 🟢 Normal | ✅ Yes | Photos, complex graphics |
+
+> **Why this matters:** If your largest image has low entropy, Chrome will skip it and use the next largest element for LCP. This can cause unexpected LCP values.
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+**Table Columns:**
+
+| Column | Description |
+|--------|-------------|
+| Image | Filename |
+| Dimensions | Width × Height in pixels |
+| Size | Encoded file size |
+| BPP | Bits per pixel (entropy measure) |
+| Entropy | 🔴 Low (< 0.05) or 🟢 Normal |
+| LCP Eligible | Whether Chrome considers it for LCP |
+| Is LCP | 👈 marks the current LCP element |
+
+**What causes low entropy:**
+- Solid color images
+- Simple gradients
+- Loading placeholders (blur-up, LQIP)
+- Very small images scaled up
+- Highly compressed images with little detail
+
+### Common Issues
+
+| Issue | Impact | Solution |
+|-------|--------|----------|
+| Placeholder as LCP | Chrome skips it, unexpected LCP | Load real image faster |
+| Gradient hero | Not counted as LCP | Use image with detail or text LCP |
+| Lazy-loaded hero | Initial low-res placeholder skipped | Eager load hero image |
+
+### Further Reading
+
+- [LCP change in Chrome 112](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/speed/metrics_changelog/2023_04_lcp.md) | Chromium
+- [Quick BPP check](https://www.phpied.com/quick-bpp-image-entropy-check/) | Stoyan Stefanov
+- [LCP Quick Check](/CoreWebVitals/LCP) | Identify your LCP element

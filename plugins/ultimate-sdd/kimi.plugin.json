@@ -1,0 +1,26 @@
+{
+  "name": "ultimate-sdd",
+  "version": "1.0.0",
+  "description": "Local-first spec-driven development: PRDs, EPICs, REQs, verifiable TASKs, CHANGE deltas, and delivery pipelines.",
+  "keywords": [
+    "prd",
+    "epic",
+    "requirement",
+    "spec",
+    "planning",
+    "readiness",
+    "acceptance-criteria",
+    "agent-handoff",
+    "product-management"
+  ],
+  "author": {
+    "name": "andrewr303"
+  },
+  "license": "MIT",
+  "skills": "./skills",
+  "agents": "./agents",
+  "commands": "./commands",
+  "interface": {
+    "displayName": "Ultimate SDD"
+  }
+}

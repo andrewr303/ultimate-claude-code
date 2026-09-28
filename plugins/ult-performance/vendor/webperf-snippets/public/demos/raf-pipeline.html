@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why we need two rAFs</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --c-js: #58a6ff;    --c-js-fg: #79b8ff;
+  --c-raf: #d2a8ff;   --c-raf-fg: #d2a8ff;
+  --c-dirty: #e3b341; --c-dirty-fg: #e3b341;
+  --c-fsl: #f85149;   --c-fsl-fg: #ff7b72;
+  --c-ok: #3fb950;    --c-ok-fg: #3fb950;
+  --c-paint: #39d353; --c-paint-fg: #56d364;
+  --tab-active-bg: #1c2a3f;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --surface2: #eaeef2;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --muted: #656d76;
+  --c-js: #0969da;    --c-js-fg: #0969da;
+  --c-raf: #8250df;   --c-raf-fg: #8250df;
+  --c-dirty: #9a6700; --c-dirty-fg: #9a6700;
+  --c-fsl: #cf222e;   --c-fsl-fg: #cf222e;
+  --c-ok: #1a7f37;    --c-ok-fg: #1a7f37;
+  --c-paint: #1a7f37; --c-paint-fg: #1a7f37;
+  --tab-active-bg: #dbeafe;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Pipeline order header ─────────────────── */
+.pipeline-order {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+.pipeline-order-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+.po-step {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.po-sep { color: var(--muted); font-size: 12px; }
+.po-step--js    { background: rgba(88,166,255,.12); border: 1px solid var(--c-js); color: var(--c-js-fg); }
+.po-step--raf   { background: rgba(210,168,255,.12); border: 1px solid var(--c-raf); color: var(--c-raf-fg); }
+.po-step--ok    { background: rgba(63,185,80,.12); border: 1px solid var(--c-ok); color: var(--c-ok-fg); }
+.po-step--paint { background: rgba(57,211,83,.1); border: 1px solid var(--c-paint); color: var(--c-paint-fg); }
+
+/* ── Tabs ──────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color .15s, color .15s, background .15s;
+  line-height: 1.2;
+}
+.tab:hover { color: var(--text); border-color: #58a6ff; }
+.tab.active { color: var(--text); background: var(--tab-active-bg); border-color: var(--c-js); }
+
+/* ── Frames ────────────────────────────────── */
+.frames { display: flex; flex-direction: column; gap: 10px; }
+
+.frame {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.frame-label {
+  padding: 5px 12px;
+  background: var(--surface2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.frame-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* ── Pipeline row ──────────────────────────── */
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.row-label {
+  width: 64px;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding-top: 6px;
+  text-align: right;
+}
+.row-items {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* ── Step boxes ────────────────────────────── */
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: .15;
+  transition: opacity .35s ease, transform .25s ease;
+}
+.step.shown { opacity: 1; }
+.step.active { transform: scale(1.06); }
+
+.step-box {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
+}
+.step-note {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* type colors */
+.t-js   .step-box { background: rgba(88,166,255,.12); border-color: var(--c-js); color: var(--c-js-fg); }
+.t-raf  .step-box { background: rgba(210,168,255,.12); border-color: var(--c-raf); color: var(--c-raf-fg); }
+.t-dirty .step-box { background: rgba(227,179,65,.12); border-color: var(--c-dirty); color: var(--c-dirty-fg); }
+.t-fsl  .step-box { background: rgba(248,81,73,.15); border-color: var(--c-fsl); color: var(--c-fsl-fg); }
+.t-ok   .step-box { background: rgba(63,185,80,.12); border-color: var(--c-ok); color: var(--c-ok-fg); }
+.t-paint .step-box { background: rgba(57,211,83,.1); border-color: var(--c-paint); color: var(--c-paint-fg); }
+.t-clean .step-box { background: rgba(63,185,80,.08); border-color: var(--c-ok); color: var(--c-ok-fg); border-style: dashed; }
+
+.sep { color: var(--muted); font-size: 14px; margin-top: 4px; opacity: .5; }
+
+/* ── Badge ─────────────────────────────────── */
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: .15;
+  transition: opacity .35s ease;
+  margin-top: 1px;
+}
+.badge.shown { opacity: 1; }
+.badge-fsl { background: rgba(248,81,73,.2); color: var(--c-fsl-fg); border: 1px solid var(--c-fsl); }
+.badge-ok  { background: rgba(63,185,80,.2); color: var(--c-ok); border: 1px solid var(--c-ok); }
+
+/* ── Controls ──────────────────────────────── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn:disabled { opacity: .4; cursor: default; }
+.btn-reset { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-next  { background: #1f6feb; color: #fff; }
+.btn-next:not(:disabled):hover { background: #388bfd; }
+.counter { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+/* ── Explanation ───────────────────────────── */
+.expl {
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--muted);
+  min-height: 58px;
+  transition: border-color .3s;
+}
+.expl strong { color: var(--text); }
+.expl code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px; background: var(--surface2); padding: 1px 4px; border-radius: 3px; color: var(--c-raf); }
+.expl.t-fsl { border-left-color: var(--c-fsl); }
+.expl.t-ok  { border-left-color: var(--c-ok); }
+.expl.t-neutral { border-left-color: var(--c-js); }
+
+.b-fsl { display: inline-block; background: rgba(248,81,73,.18); color: var(--c-fsl-fg); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; vertical-align: middle; }
+.b-ok  { display: inline-block; background: rgba(63,185,80,.18); color: var(--c-ok); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- Frame pipeline header -->
+<div class="pipeline-order">
+  <span class="pipeline-order-label">Frame pipeline order</span>
+  <span class="po-step po-step--js">JS</span>
+  <span class="po-sep">→</span>
+  <span class="po-step po-step--raf">rAF callbacks</span>
+  <span class="po-sep">→</span>
+  <span class="po-step po-step--ok">Recalculate Style</span>
+  <span class="po-sep">→</span>
+  <span class="po-step po-step--ok">Layout</span>
+  <span class="po-sep">→</span>
+  <span class="po-step po-step--paint">Paint</span>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" data-s="0">❌ No fix</button>
+  <button class="tab" data-s="1">⚠️ Single rAF</button>
+  <button class="tab" data-s="2">✅ Double rAF</button>
+</div>
+
+<!-- Visualization -->
+<div id="viz" class="frames"></div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="btn btn-reset" id="btnReset">↩ Reset</button>
+  <button class="btn btn-next" id="btnNext">Next step →</button>
+  <span class="counter" id="counter"></span>
+</div>
+
+<!-- Explanation -->
+<div class="expl t-neutral" id="expl">
+  Click <strong>Next step</strong> to see how the browser processes each operation.
+</div>
+
+<script>
+// ─── Scenario data ────────────────────────────────────────────────────────────
+const S = [
+  // ─── Scenario 0: No fix ────────────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Frame N',
+        rows: [
+          { label: 'JS Task', items: [
+            { id: 's0-toggle', type: 'js', text: 'classList.toggle()' },
+            { id: 's0-dirty', type: 'dirty', text: 'styles dirty', note: '⚠️' },
+            { id: 's0-scroll', type: 'fsl', text: 'scrollTop = 0', note: 'geometry access' },
+          ]},
+          { label: 'FSL', items: [
+            { id: 's0-fslr', type: 'fsl', text: '⚡ Recalc Style', note: 'forced' },
+            { id: 's0-fsll', type: 'fsl', text: '⚡ Layout', note: 'forced' },
+            { id: 's0-badge', type: 'badge-fsl', text: 'FSL ⚠️' },
+          ]},
+          { label: 'Natural', items: [
+            { id: 's0-paint', type: 'paint', text: 'Paint' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['s0-toggle'], cls: 't-neutral', expl: '<strong>classList.toggle()</strong> modifies the container\'s classes. Styles are marked as <em>dirty</em>: the browser needs to recalculate, but it can wait until the end of the frame.' },
+      { ids: ['s0-dirty'],  cls: 't-neutral', expl: 'The style tree is <strong>dirty</strong>. On the next line we access <code>scrollTop</code>, which requires knowing the exact geometry.' },
+      { ids: ['s0-scroll'], cls: 't-fsl', expl: '<strong>scrollTop = 0</strong> needs to know the current scroll position, which depends on layout. Since styles are dirty, the browser <strong>cannot wait</strong>: it must resolve styles and layout right now.' },
+      { ids: ['s0-fslr'],   cls: 't-fsl', expl: '<span class="b-fsl">FSL</span> The browser interrupts JS execution to run <strong>Recalculate Style</strong> synchronously. With 3,000 elements and <code>:nth-child</code> selectors, this can exceed 200 ms.' },
+      { ids: ['s0-fsll'],   cls: 't-fsl', expl: '<span class="b-fsl">FSL</span> Immediately after, <strong>forced Layout</strong>: the browser computes positions and dimensions for all affected elements. The main thread has been blocked throughout this entire operation.' },
+      { ids: ['s0-badge'],  cls: 't-fsl', expl: 'Result: a <strong>Forced Synchronous Layout</strong> visible in the Performance Panel as a long <code>RunTask</code>. The main thread was blocked from <code>toggle()</code> until Layout finished.' },
+      { ids: ['s0-paint'],  cls: 't-neutral', expl: 'The frame is finally painted. But the task was artificially long: the entire Recalc Style + Layout happened synchronously inside JavaScript code.' },
+    ]
+  },
+
+  // ─── Scenario 1: Single rAF ────────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Frame N',
+        rows: [
+          { label: 'JS Task', items: [
+            { id: 's1-toggle', type: 'js', text: 'classList.toggle()' },
+            { id: 's1-dirty', type: 'dirty', text: 'styles dirty', note: '⚠️ — rAF registered' },
+          ]},
+          { label: 'rAF', items: [
+            { id: 's1-raf', type: 'raf', text: 'rAF: scrollTop = 0', note: 'styles STILL dirty' },
+          ]},
+          { label: 'FSL', items: [
+            { id: 's1-fslr', type: 'fsl', text: '⚡ Recalc Style', note: 'forced inside rAF' },
+            { id: 's1-fsll', type: 'fsl', text: '⚡ Layout', note: 'forced' },
+            { id: 's1-badge', type: 'badge-fsl', text: 'FSL ⚠️' },
+          ]},
+          { label: 'Natural', items: [
+            { id: 's1-paint', type: 'paint', text: 'Paint' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['s1-toggle'], cls: 't-neutral', expl: '<strong>classList.toggle()</strong> invalidates styles. This time we register a <code>requestAnimationFrame</code> instead of accessing <code>scrollTop</code> directly.' },
+      { ids: ['s1-dirty'],  cls: 't-neutral', expl: 'Styles are <strong>dirty</strong>. The frame\'s JS has finished and the rAF is registered. Will the browser resolve styles before the rAF fires?' },
+      { ids: ['s1-raf'],    cls: 't-fsl', expl: '<strong>The rAF fires BEFORE Recalculate Style!</strong> Look at the frame order (above): <em>rAF callbacks</em> comes before <em>Recalculate Style</em>. When the rAF runs, styles are <strong>still dirty</strong>.' },
+      { ids: ['s1-fslr'],   cls: 't-fsl', expl: '<span class="b-fsl">FSL</span> By accessing <code>scrollTop</code> inside the rAF, the browser <strong>forces the same Recalc Style</strong> we wanted to avoid. A single rAF only delays the access, but doesn\'t let the browser clean styles first.' },
+      { ids: ['s1-fsll'],   cls: 't-fsl', expl: '<span class="b-fsl">FSL</span> <strong>Forced Layout</strong> again, with the same cost as without the rAF. The root problem remains: the geometry access happens before the browser could do the natural Recalc Style.' },
+      { ids: ['s1-badge'],  cls: 't-fsl', expl: 'The result is <strong>identical to the no-fix scenario</strong>. A single rAF is not enough because the frame order is <em>rAF → Recalc Style</em>, not the other way around.' },
+      { ids: ['s1-paint'],  cls: 't-neutral', expl: 'The frame is painted, but with the same FSL. We need the natural Recalc Style to happen <em>before</em> we access geometry, and for that we need a second rAF in the next frame.' },
+    ]
+  },
+
+  // ─── Scenario 2: Double rAF ────────────────────────────────────────────────
+  {
+    frames: [
+      {
+        label: 'Frame N',
+        rows: [
+          { label: 'JS Task', items: [
+            { id: 's2-toggle', type: 'js', text: 'classList.toggle()' },
+            { id: 's2-dirty', type: 'dirty', text: 'styles dirty', note: '⚠️ — rAF1 registered' },
+          ]},
+          { label: 'rAF1', items: [
+            { id: 's2-raf1', type: 'raf', text: 'rAF1: registers rAF2', note: 'no geometry access' },
+          ]},
+          { label: 'Natural', items: [
+            { id: 's2-nr', type: 'ok', text: '✓ Recalc Style', note: 'natural, non-blocking' },
+            { id: 's2-nl', type: 'ok', text: '✓ Layout', note: 'natural' },
+            { id: 's2-clean', type: 'clean', text: 'styles clean', note: '✅' },
+          ]},
+          { label: 'Paint', items: [
+            { id: 's2-p1', type: 'paint', text: 'Paint' },
+          ]},
+        ]
+      },
+      {
+        label: 'Frame N+1',
+        rows: [
+          { label: 'rAF2', items: [
+            { id: 's2-raf2', type: 'raf', text: 'rAF2: scrollTop = 0', note: 'styles already clean ✅' },
+          ]},
+          { label: 'Natural', items: [
+            { id: 's2-ml', type: 'ok', text: '✓ Minimal layout', note: 'scroll only' },
+            { id: 's2-ok', type: 'badge-ok', text: 'No FSL ✓' },
+          ]},
+          { label: 'Paint', items: [
+            { id: 's2-p2', type: 'paint', text: 'Paint' },
+          ]},
+        ]
+      }
+    ],
+    steps: [
+      { ids: ['s2-toggle'], cls: 't-neutral', expl: '<strong>classList.toggle()</strong> invalidates styles. We register the first rAF and JS finishes. The frame will continue with the next phases.' },
+      { ids: ['s2-dirty'],  cls: 't-neutral', expl: 'Styles <strong>dirty</strong>. This time we won\'t touch geometry in rAF1, we\'ll just register rAF2 and let the browser do its work.' },
+      { ids: ['s2-raf1'],   cls: 't-neutral', expl: '<strong>rAF1 fires.</strong> It only registers a second <code>requestAnimationFrame</code> and finishes. We don\'t access any geometry property. The browser can continue with the next frame phases naturally.' },
+      { ids: ['s2-nr'],     cls: 't-ok', expl: '<span class="b-ok">✓ Natural</span> Since rAF1 didn\'t force any layout, the browser runs <strong>Recalculate Style naturally</strong> at the end of the frame. Even if it\'s costly (<code>:nth-child</code> selectors), it happens outside any JS task: it doesn\'t block.' },
+      { ids: ['s2-nl'],     cls: 't-ok', expl: '<span class="b-ok">✓ Natural</span> <strong>Natural Layout</strong>: the browser computes geometry as part of the normal pipeline. By the end of this frame, the style and layout tree is fully updated.' },
+      { ids: ['s2-clean'],  cls: 't-ok', expl: 'End of Frame N. Styles are <strong>clean</strong>. rAF2 is registered for the next frame, when the tree will already be resolved.' },
+      { ids: ['s2-p1'],     cls: 't-ok', expl: 'Frame N is painted. The JS task was very short: just the <code>toggle()</code> and registering rAF1. The costly Recalc Style happened naturally, outside the task.' },
+      { ids: ['s2-raf2'],   cls: 't-ok', expl: '<strong>rAF2 fires in Frame N+1.</strong> Now we access <code>scrollTop = 0</code>. Styles are already <strong>clean</strong> because Frame N resolved them naturally. The browser doesn\'t need to force anything.' },
+      { ids: ['s2-ml'],     cls: 't-ok', expl: '<span class="b-ok">No FSL</span> Only a <strong>minimal Layout</strong> to apply the scroll reset, without forced style recalculation. The main thread is free.' },
+      { ids: ['s2-ok'],     cls: 't-ok', expl: '<span class="b-ok">✓ No FSL</span> The double rAF works because the 1st rAF lets Frame N resolve styles naturally, and the 2nd rAF accesses geometry when the tree is already clean. <strong>The main thread never blocks.</strong>' },
+      { ids: ['s2-p2'],     cls: 't-ok', expl: 'Frame N+1 is painted. Two frames instead of one, but no long task blocking interactions. INP improves because the main thread was free between both frames.' },
+    ]
+  }
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let sIdx = 0;
+let stepIdx = 0;
+let revealed = new Set();
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  const sc = S[sIdx];
+  const viz = document.getElementById('viz');
+
+  viz.innerHTML = sc.frames.map(frame => `
+    <div class="frame">
+      <div class="frame-label">${frame.label}</div>
+      <div class="frame-body">
+        ${frame.rows.map(row => `
+          <div class="row">
+            <span class="row-label">${row.label}</span>
+            <div class="row-items">
+              ${row.items.map((item, i) => {
+                const sep = i < row.items.length - 1 ? '<span class="sep">→</span>' : '';
+                if (item.type === 'badge-fsl') {
+                  return `<span class="badge badge-fsl" id="${item.id}">${item.text}</span>${sep}`;
+                }
+                if (item.type === 'badge-ok') {
+                  return `<span class="badge badge-ok" id="${item.id}">${item.text}</span>${sep}`;
+                }
+                return `
+                  <div class="step t-${item.type}" id="${item.id}">
+                    <span class="step-box">${item.text}</span>
+                    ${item.note ? `<span class="step-note">${item.note}</span>` : ''}
+                  </div>${sep}
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  updateState();
+}
+
+function updateState() {
+  const sc = S[sIdx];
+
+  sc.frames.forEach(frame => {
+    frame.rows.forEach(row => {
+      row.items.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (!el) return;
+        el.classList.toggle('shown', revealed.has(item.id));
+        el.classList.toggle('active', false);
+      });
+    });
+  });
+
+  if (stepIdx > 0) {
+    const cur = sc.steps[stepIdx - 1];
+    cur.ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    });
+  }
+
+  const expl = document.getElementById('expl');
+  if (stepIdx === 0) {
+    expl.innerHTML = 'Click <strong>Next step</strong> to see how the browser processes each operation.';
+    expl.className = 'expl t-neutral';
+  } else {
+    const cur = sc.steps[stepIdx - 1];
+    expl.innerHTML = cur.expl;
+    expl.className = `expl ${cur.cls}`;
+  }
+
+  const total = sc.steps.length;
+  document.getElementById('counter').textContent = `Step ${stepIdx} / ${total}`;
+  document.getElementById('btnNext').disabled = stepIdx >= total;
+}
+
+function nextStep() {
+  const sc = S[sIdx];
+  if (stepIdx >= sc.steps.length) return;
+  const cur = sc.steps[stepIdx];
+  cur.ids.forEach(id => revealed.add(id));
+  stepIdx++;
+  updateState();
+}
+
+function reset() {
+  stepIdx = 0;
+  revealed.clear();
+  render();
+}
+
+function setScenario(i) {
+  sIdx = i;
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j));
+  reset();
+}
+
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => setScenario(+t.dataset.s));
+});
+document.getElementById('btnNext').addEventListener('click', nextStep);
+document.getElementById('btnReset').addEventListener('click', reset);
+
+render();
+
+// ─── Theme ───────────────────────────────────────────────────────────────────
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t || 'dark');
+}
+(function initTheme() {
+  const stored = localStorage.getItem('theme');
+  if (stored) { applyTheme(stored); return; }
+  applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+})();
+window.addEventListener('storage', e => { if (e.key === 'theme') applyTheme(e.newValue); });
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+});
+
+// ─── Height notification ───────────────────────────────────────────────────────
+function notifyHeight() {
+  const h = document.body.offsetHeight;
+  window.parent.postMessage({ demoHeight: h }, '*');
+}
+new ResizeObserver(notifyHeight).observe(document.body);
+</script>
+</body>
+</html>

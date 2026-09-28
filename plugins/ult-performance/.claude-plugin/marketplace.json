@@ -1,0 +1,16 @@
+{
+  "name": "ult-performance",
+  "owner": {
+    "name": "Ult Performance"
+  },
+  "metadata": {
+    "description": "Ultimate web performance plugin for Claude Code, Codex, and Kimi Code."
+  },
+  "plugins": [
+    {
+      "name": "ult-performance",
+      "source": "./",
+      "description": "Measured performance, Core Web Vitals, loading, interaction, media, animation, accessibility, SEO, and quality audits. Default skill ult-performance routes the agent."
+    }
+  ]
+}

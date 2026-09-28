@@ -1,0 +1,92 @@
+import snippet from '../../snippets/Loading/Fonts-Preloaded-Loaded-and-used-above-the-fold.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# Fonts Preloaded, Loaded, and Used Above The Fold
+
+Analyzes font loading strategy by comparing preloaded fonts, loaded fonts, and fonts actually used above the fold. This helps identify optimization opportunities and wasted resources.
+
+**Why font loading matters:**
+
+| Issue | Impact | Solution |
+|-------|--------|----------|
+| **FOIT** (Flash of Invisible Text) | Text hidden until font loads | Use `font-display: swap` or `optional` |
+| **FOUT** (Flash of Unstyled Text) | Text switches fonts visibly | Preload critical fonts, use `font-display: optional` |
+| **Unused preloads** | Wasted bandwidth, delayed other resources | Remove unnecessary preloads |
+| **Missing preloads** | LCP delay for text-based LCP | Add preload for critical fonts |
+
+**Font-display values:**
+
+| Value | Behavior | Best for |
+|-------|----------|----------|
+| `auto` | Browser default (usually FOIT) | Rarely recommended |
+| `block` | FOIT up to 3s, then swap | Icons, critical brand fonts |
+| `swap` | Immediate fallback, swap when ready | Body text, most use cases |
+| `fallback` | Brief FOIT (~100ms), swap if fast | Balance of performance/aesthetics |
+| `optional` | Brief FOIT, may skip font entirely | Non-critical fonts, slow connections |
+
+> **Tip:** For LCP optimization, critical fonts should be preloaded AND use `font-display: swap` or `optional`.
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+**Summary Section:**
+- Count of preloaded, loaded, and used fonts
+
+**Preloaded Fonts:**
+- Fonts loaded via `<link rel="preload" as="font">`
+- Shows type, third-party status, and crossorigin attribute
+- Warning if crossorigin is missing (causes double fetch)
+
+**Loaded Fonts:**
+- Fonts loaded via CSS `@font-face`
+- Shows family, weight, style, and font-display value
+- Warning if using default font-display
+
+**Used Above The Fold:**
+- Fonts actually rendered in the viewport
+- Shows element count using each font combination
+
+**Potential Issues:**
+
+| Issue | Meaning | Action |
+|-------|---------|--------|
+| Preloaded but not used | Wasting bandwidth | Remove preload or defer loading |
+| Used but not preloaded | Potential LCP delay | Add preload for critical fonts |
+
+### Common Font Loading Patterns
+
+**Optimal setup for critical fonts:**
+
+```html
+<!-- Preload in <head> -->
+<link rel="preload" href="/fonts/heading.woff2" as="font" type="font/woff2" crossorigin>
+
+<!-- CSS with font-display -->
+<style>
+@font-face {
+  font-family: 'Heading';
+  src: url('/fonts/heading.woff2') format('woff2');
+  font-display: swap;
+}
+</style>
+```
+
+**For non-critical fonts:**
+
+```css
+@font-face {
+  font-family: 'BodyFont';
+  src: url('/fonts/body.woff2') format('woff2');
+  font-display: optional; /* Skip if slow connection */
+}
+```
+
+### Further Reading
+
+- [Optimize WebFont loading](https://web.dev/articles/optimize-webfont-loading) | web.dev
+- [Best practices for fonts](https://web.dev/articles/font-best-practices) | web.dev
+- [Preload critical assets](https://web.dev/articles/preload-critical-assets) | web.dev
+- [CSS Font Loading API](https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API) | MDN

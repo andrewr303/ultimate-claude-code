@@ -1,0 +1,58 @@
+import snippet from '../../snippets/CoreWebVitals/LCP.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# Largest Contentful Paint (LCP)
+
+Quick check for [Largest Contentful Paint](https://web.dev/articles/lcp), a Core Web Vital that measures loading performance. LCP marks when the largest content element becomes visible in the viewport.
+
+**LCP Rating Thresholds:**
+
+| Rating | Time | Meaning |
+|--------|------|---------|
+| 🟢 Good | ≤ 2.5s | Fast, content appears quickly |
+| 🟡 Needs Improvement | ≤ 4s | Moderate delay |
+| 🔴 Poor | > 4s | Slow, users may abandon |
+
+> **Need to optimize?** Use [LCP Subparts](/CoreWebVitals/LCP-Subparts) to identify which phase (TTFB, load delay, load time, render delay) is causing the bottleneck.
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding LCP
+
+**What can be an LCP element:**
+- `<img>` elements
+- `<image>` inside `<svg>`
+- `<video>` poster images
+- Elements with `background-image` (CSS)
+- Block-level text elements (`<p>`, `<h1>`, etc.)
+
+**LCP updates until:**
+- User interacts (click, scroll, keypress)
+- A larger element renders
+- Page load completes
+
+### Common Causes of Slow LCP
+
+| Cause | Solution |
+|-------|----------|
+| Slow server response | Optimize TTFB, use CDN |
+| Render-blocking resources | Defer non-critical CSS/JS |
+| Slow resource load | Preload LCP image, optimize size |
+| Client-side rendering | Use SSR or prerender |
+
+### Browser Support
+
+| API | Chrome | Firefox | Safari | Edge |
+|-----|--------|---------|--------|------|
+| Largest Contentful Paint API | ✅ 77 | ❌ | ❌ | ✅ 79 |
+| PerformanceObserver | ✅ 52 | ✅ 57 | ✅ 11 | ✅ 79 |
+
+### Further Reading
+
+- [Largest Contentful Paint (LCP)](https://web.dev/articles/lcp) | web.dev
+- [Optimize LCP](https://web.dev/articles/optimize-lcp) | web.dev
+- [LCP Subparts](/CoreWebVitals/LCP-Subparts) | Detailed phase breakdown
+- [LCP Trail](/CoreWebVitals/LCP-Trail) | Visualize all LCP candidates during page load
+- [FCP](/Loading/FCP) | First Contentful Paint — the earliest paint signal before LCP

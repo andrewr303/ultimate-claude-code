@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "runId": "00000000-0000-4000-8000-000000000001",
+    "schemaVersion": 1,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "sourceHashes": [{"path": "synthetic-card.dc.html", "sha256": "78775506445b4469b79f22e293f8953d0a5e35f47574cea6a6e251611577bbe0", "bytes": 363}],
+    "confidence": "observed",
+    "reviewStatus": "approved",
+    "approvedBy": "Synthetic fixture reviewer (not production approval)",
+    "approvedAt": "2026-01-01T00:00:00.000Z",
+    "sourceViewport": null,
+    "notes": "Synthetic test fixture only. Approval represents reviewed fixture data, not a real portal design."
+  },
+  "tokens": {
+    "primitive": {"card-surface": {"value": "#fff", "type": "color"}, "card-ink": {"value": "#1a1a1a", "type": "color"}},
+    "semantic": {}, "component": {}
+  },
+  "assets": [],
+  "hierarchy": {"root": "synthetic-card", "tree": [{"id": "synthetic-card", "role": "article", "children": ["follow-button"]}]},
+  "components": [{
+    "stableId": "synthetic-card",
+    "anatomy": {"root": "article", "slots": {"title": "h1", "description": "p", "action": "button"}, "parts": ["article", "h1", "p", "button"]},
+    "props": [{"name": "title", "type": "string", "required": true}, {"name": "description", "type": "string", "required": true}],
+    "events": [{"name": "onFollow", "type": "function", "payload": "void"}],
+    "backend": "native",
+    "states": {
+      "default": {"applicable": true, "value": {"source": "button resting state"}},
+      "hover": {"applicable": false, "reason": "No hover treatment specified in synthetic source"},
+      "focus": {"applicable": true, "value": {"source": "native visible button focus; implementation must retain visible focus"}},
+      "active": {"applicable": true, "value": {"source": "native button activation"}},
+      "disabled": {"applicable": false, "reason": "Synthetic source has no disabled behavior"},
+      "loading": {"applicable": false, "reason": "Synthetic source has no asynchronous behavior"},
+      "error": {"applicable": false, "reason": "Synthetic source has no error feedback"},
+      "selected": {"applicable": false, "reason": "Synthetic source has no selection behavior"}
+    },
+    "keyboard": {"rules": [{"key": "Tab", "action": "focus button"}, {"key": "Enter", "action": "activate button"}, {"key": "Space", "action": "activate button"}], "focusManagement": "native"},
+    "accessibility": {"role": "article", "labelStrategy": "visible heading"}
+  }],
+  "themes": {"light": {"surface": "#fff", "ink": "#1a1a1a"}, "dark": {}},
+  "rtl": {"supported": false, "direction": "ltr", "logicalProperties": false},
+  "reducedMotion": {"supported": true, "behavior": "no source animations"},
+  "responsive": {"breakpoints": {}, "containerQueries": false, "rules": []},
+  "unknowns": [],
+  "evidence": {"synthetic-card.dc.html": {"path": "synthetic-card.dc.html", "sha256": "78775506445b4469b79f22e293f8953d0a5e35f47574cea6a6e251611577bbe0", "confidence": "observed", "description": "Synthetic fixture source, not real portal evidence"}}
+}

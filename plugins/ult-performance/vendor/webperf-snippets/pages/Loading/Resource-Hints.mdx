@@ -1,0 +1,109 @@
+import snippet from '../../snippets/Loading/Resource-Hints.js?raw'
+import { Snippet } from '../../components/Snippet'
+import { Demo } from '../../components/Demo'
+
+# Resource Hints
+
+Analyzes resource hints on the page, checking for proper usage and identifying optimization opportunities. Resource hints help the browser prioritize resource loading for better performance.
+
+**Resource hint types:**
+
+| Hint | Purpose | When to Use | Priority |
+|------|---------|-------------|----------|
+| **preload** | Load resource for current page | Critical CSS, fonts, hero images, LCP | Highest |
+| **modulepreload** | Preload ES modules | Critical JavaScript modules | High |
+| **preconnect** | Establish early connection | Third-party origins you'll fetch from | High |
+| **dns-prefetch** | Resolve DNS early | Third-party origins (fallback for preconnect) | Medium |
+| **prefetch** | Load resource for next navigation | Resources needed on likely next page | Low |
+| **prerender** | Pre-render entire page | High-probability next navigation | Lowest |
+
+**Loading priority:**
+
+```
+preload/modulepreload → preconnect → dns-prefetch → prefetch → prerender
+     (current page)                                    (future navigation)
+```
+
+**Common mistakes:**
+
+| Mistake | Impact | Solution |
+|---------|--------|----------|
+| Preload without `as` | Browser can't prioritize | Add `as="script"`, `as="style"`, etc. |
+| Font preload without `crossorigin` | Double fetch | Always add `crossorigin` for fonts |
+| Too many preloads (> 5-6) | Bandwidth competition | Prioritize only critical resources |
+| Unused preloads | Wasted bandwidth | Remove or verify usage |
+| Preconnect without usage | Wasted connection | Only preconnect to used origins |
+
+> **Tip:** Preload is for resources needed in the current page. Prefetch is for resources needed in future navigations. Don't confuse them!
+
+### Why Preconnect Helps
+
+`preconnect` pays off when a resource lives on a third-party origin: it moves the connection setup (DNS, TCP, TLS) off the critical path, so the request can start as soon as the resource is discovered. Step through the scenarios to compare connection reuse across HTTP versions and see what `preconnect` saves:
+
+<Demo
+  src="/demos/network-waterfall.html"
+  title="Interactive network waterfall comparing HTTP/1.1 with Connection: close, HTTP/1.1 keep-alive, HTTP/2, and HTTP/2 with preconnect"
+  caption="Switch between HTTP/1.1, keep-alive, HTTP/2, and HTTP/2 + preconnect to compare how each affects the request waterfall."
+  heightKey="netWaterfallHeight"
+/>
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+**Summary Section:**
+- Count of each resource hint type
+- Green (🟢) = hints present, Grey (⚪) = no hints of this type
+
+**Details by Type:**
+
+For **preload/modulepreload**:
+| Column | Description |
+|--------|-------------|
+| Resource | URL (truncated if long) |
+| As | Resource type (script, style, font, image) |
+| Crossorigin | CORS setting |
+| Priority | fetchpriority if set |
+| Used | Whether the resource was actually loaded |
+
+For **preconnect/dns-prefetch**:
+| Column | Description |
+|--------|-------------|
+| Origin | Domain being connected to |
+| Crossorigin | CORS setting |
+| Resources Loaded | Count of resources from this origin |
+
+**Issues Detected:**
+
+| Issue | Severity | Impact |
+|-------|----------|--------|
+| Preload missing `as` | Error | Browser can't prioritize correctly |
+| Font preload without `crossorigin` | Error | Resource fetched twice |
+| Preconnect without `crossorigin` for CORS | Warning | Connection may not be reused |
+| Unused preload | Warning | Wasted bandwidth |
+| Preconnect without resources | Warning | Wasted connection |
+| Too many preloads (> 6) | Warning | Bandwidth competition |
+
+**Optimization Opportunities:**
+- Third-party origins loading multiple resources without preconnect
+- Suggested `<link>` tags to add
+
+### Priority Guidelines
+
+| Resource Type | Suggested Hint |
+|---------------|----------------|
+| LCP image | `preload` with `fetchpriority="high"` |
+| Critical fonts | `preload` with `crossorigin` |
+| Critical CSS | `preload` |
+| Third-party scripts | `preconnect` to origin |
+| Below-fold images | None (use `loading="lazy"`) |
+| Next page resources | `prefetch` |
+
+### Further Reading
+
+- [Preload critical assets](https://web.dev/articles/preload-critical-assets) | web.dev
+- [Establish network connections early](https://web.dev/articles/preconnect-and-dns-prefetch) | web.dev
+- [Prefetch resources](https://developer.chrome.com/docs/devtools/application/debugging-speculation-rules) | Chrome Developers
+- [Resource Hints specification](https://www.w3.org/TR/resource-hints/) | W3C

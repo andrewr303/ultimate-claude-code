@@ -1,0 +1,21 @@
+{
+  "name": "ult-performance",
+  "interface": {
+    "displayName": "Ult Performance"
+  },
+  "plugins": [
+    {
+      "name": "ult-performance",
+      "description": "Ultimate web performance plugin: measured Core Web Vitals, loading, interaction, media, animation, accessibility, SEO, and quality audits.",
+      "source": {
+        "source": "local",
+        "path": "./codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

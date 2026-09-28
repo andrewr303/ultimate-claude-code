@@ -1,0 +1,135 @@
+import { LazyVideoPlayer } from "../components/LazyVideoPlayer";
+
+# WebPerf Snippets
+
+A curated collection of JavaScript snippets to measure and debug Web Performance directly in your browser's DevTools console.
+
+<picture style={{ marginTop: "20px", display: "block" }}>
+  <img
+    width="1200"
+    height="749"
+    sizes="85vw"
+    srcSet="https://res.cloudinary.com/nucliweb/image/upload/c_scale,f_auto,q_auto,w_600/v1685735993/webperf-snippets/DevTools-Snippets.png 600w,
+            https://res.cloudinary.com/nucliweb/image/upload/c_scale,f_auto,q_auto,w_1200/v1685735993/webperf-snippets/DevTools-Snippets.png 1200w"
+    src="https://res.cloudinary.com/nucliweb/image/upload/c_scale,f_auto,q_auto,w_342/v1685735993/webperf-snippets/DevTools-Snippets.png"
+    loading="eager"
+    decoding="sync"
+    fetchpriority="high"
+    alt="Chrome DevTools"
+  />
+</picture>
+
+## What you can measure
+
+| Category                                                         | What it includes                                                                                                                                                                                                                                                  |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **[Core Web Vitals](/CoreWebVitals/LCP)**                        | CLS, INP, LCP, LCP Image Entropy, LCP Sub-Parts, LCP Trail, LCP Video Candidate                                                                                                                                                                                   |
+| **[Loading](/Loading/TTFB)**                                     | TTFB, JS Execution Time Breakdown, FCP, Back/Forward Cache, CSS Media Queries Analysis, Critical CSS Detection, SSR Hydration Data Analysis, Validate Preload on Async/Defer Scripts, Prefetch Resource Validation, Priority Hints Audit, Service Worker Analysis |
+| **[Interaction](/Interaction/Long-Animation-Frames)**            | Interactions, Input Latency Breakdown, Layout Shift, Long Animation Frames, Long Task, Scroll Performance                                                                                                                                                         |
+| **[Resources](/Resources/Network-Bandwidth-Connection-Quality)** | Network Bandwidth & Connection Quality                                                                                                                                                                                                                            |
+| **[Media](/Media/Image-Element-Audit)**                          | Image Element Audit, Video Element Audit                                                                                                                                                                                                                          |
+
+## Quick Start
+
+Copy this snippet and paste it in your browser console to see your page's Core Web Vitals:
+
+```js copy
+// Quick Core Web Vitals Check
+new PerformanceObserver((l) => {
+  l.getEntries().forEach((e) => {
+    const name = e.name || e.entryType;
+    console.log(`${name}: ${Math.round(e.startTime || e.value || e.duration)}ms`);
+  });
+}).observe({ type: "largest-contentful-paint", buffered: true });
+
+new PerformanceObserver((l) => {
+  let cls = 0;
+  l.getEntries().forEach((e) => {
+    if (!e.hadRecentInput) cls += e.value;
+  });
+  console.log(`CLS: ${cls.toFixed(3)}`);
+}).observe({ type: "layout-shift", buffered: true });
+```
+
+For more detailed analysis, explore the snippets in each category.
+
+## How to use
+
+### Requirements
+
+All snippets are tested in [Google Chrome](https://google.com/chrome/). Most snippets also work in other Chromium-based browsers (Edge, Brave, Arc) and Firefox. Safari has limited Performance API support.
+
+### Option 1: Run in browser console
+
+1. Copy any snippet (click the copy button)
+2. Open DevTools (`F12` or `Cmd+Option+I` / `Ctrl+Shift+I`)
+3. Go to the **Console** tab
+4. Paste and press `Enter`
+
+### Option 2: Save as DevTools Snippet
+
+Save frequently used snippets for quick access:
+
+1. Open DevTools → **Sources** tab → **Snippets** panel
+2. Click **+ New snippet**
+3. Name it (e.g., "LCP")
+4. Paste the code
+5. Right-click → **Run** (or `Cmd+Enter` / `Ctrl+Enter`)
+
+### Option 3: Use with AI Agent Skills
+
+Run snippets autonomously through an AI agent via [Claude Code](https://claude.ai/code) and [Chrome DevTools MCP](https://github.com/chrome-devtools-mcp). The [WebPerf Skills](https://github.com/nucliweb/webperf-snippets/tree/main/.claude/skills) provide deterministic, consistent measurements across sessions — the agent executes the exact snippet code without improvising JavaScript.
+
+Available skills: `webperf`, `webperf-core-web-vitals`, `webperf-loading`, `webperf-interaction`, `webperf-media`, `webperf-resources`.
+
+→ [Learn how WebPerf Agent Skills work](https://joanleon.dev/en/webperf-snippets-agent-skills/)
+
+### Video tutorial
+
+<div style={{ marginTop: "20px", display: "block" }}>
+  <LazyVideoPlayer
+    width="1920"
+    height="1080"
+    src="webperf-snippets/devtools-new-snippet"
+    poster="https://res.cloudinary.com/nucliweb/video/upload/so_auto,f_jpg,q_auto/webperf-snippets/devtools-new-snippet.jpg"
+  />
+</div>
+
+## AI Agent Skills
+
+WebPerf Snippets powers a set of [Agent Skills](https://github.com/nucliweb/webperf-snippets/tree/main/.claude/skills) for autonomous performance audits. Instead of copying and pasting snippets manually, an AI agent executes them deterministically through Chrome DevTools MCP — the same code, every time, across sessions and models.
+
+| Skill                     | What it covers                                             |
+| ------------------------- | ---------------------------------------------------------- |
+| `webperf`                 | General-purpose performance audit entry point              |
+| `webperf-core-web-vitals` | LCP, CLS, INP with guided diagnosis workflows              |
+| `webperf-loading`         | TTFB, FCP, render-blocking, fonts, scripts, resource hints |
+| `webperf-interaction`     | INP, long tasks, scroll jank, animation frames             |
+| `webperf-media`           | Image and video audits, lazy loading, LCP media            |
+| `webperf-resources`       | Network quality, adaptive loading strategies               |
+
+The skills include decision trees that automatically trigger deeper analysis when thresholds are exceeded — for example, when TTFB is slow, the agent runs TTFB sub-parts diagnostics to pinpoint whether the issue is DNS, connection, or backend latency.
+
+→ [Read more about WebPerf Agent Skills](https://joanleon.dev/en/webperf-snippets-agent-skills/)
+
+## CLI
+
+Run the same curated snippets headlessly via Playwright — no copy-pasting into DevTools. Diagnose LCP regressions in CI, gate pull requests on real performance budgets, and automate the audits you already run by hand.
+
+```bash copy
+npx webperf-snippets https://web.dev --workflow audit
+npx webperf-snippets https://web.dev --budget-lcp 2500 --budget-cls 0.1
+```
+
+| Workflow          | What it runs                                                         |
+| ----------------- | -------------------------------------------------------------------- |
+| `core-web-vitals` | LCP, CLS — with automatic LCP-Subparts follow-up                     |
+| `audit`           | Render-blocking, resource hints, critical CSS, TTFB, scripts, images |
+
+→ [CLI documentation](/CLI)
+
+## Resources
+
+- [Web Vitals](https://web.dev/articles/vitals) - Learn about Core Web Vitals
+- [Chrome DevTools](https://developer.chrome.com/docs/devtools/) - Official documentation
+- [GitHub Repository](https://github.com/nucliweb/webperf-snippets) - Star, fork, or contribute

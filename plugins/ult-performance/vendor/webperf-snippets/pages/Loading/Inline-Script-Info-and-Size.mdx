@@ -1,0 +1,90 @@
+import snippet from '../../snippets/Loading/Inline-Script-Info-and-Size.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# Inline Script Info and Size
+
+Analyzes all inline `<script>` tags on the page, measuring their size and identifying potential performance issues. This helps understand the impact of inline JavaScript on page load.
+
+**When inline scripts are good:**
+
+| Scenario | Benefit |
+|----------|---------|
+| **Critical initialization** | No network request, immediate execution |
+| **Small config/state** | Hydration data, feature flags (< 1 KB) |
+| **Above-the-fold interactivity** | Faster Time to Interactive |
+
+**When inline scripts are problematic:**
+
+| Issue | Impact | Threshold |
+|-------|--------|-----------|
+| **Parser-blocking** | Blocks HTML parsing until executed | Any script in `<head>` without defer |
+| **Too large** | Bloats HTML, not cacheable | > 2-3 KB |
+| **Duplicated** | Wasted bytes, potential conflicts | Same code in multiple scripts |
+| **Long execution** | Blocks main thread | > 50ms execution time |
+
+> **Key difference from CSS:** Unlike CSS which blocks rendering, inline scripts block HTML *parsing*. A large inline script in `<head>` delays everything below it.
+
+**Script types:**
+
+| Type | Attribute | Behavior |
+|------|-----------|----------|
+| Classic | (none) | Parser-blocking, executes immediately |
+| Module | `type="module"` | Deferred by default, strict mode |
+| JSON-LD | `type="application/ld+json"` | Not executed, SEO structured data |
+| Template | `type="text/template"` | Not executed, stored as text |
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+**Summary Section:**
+- Total inline scripts by category
+- Total executable size
+- Parser-blocking count (especially in `<head>`)
+- Overall rating
+
+**Executable Scripts Table:**
+
+| Column | Description |
+|--------|-------------|
+| # | Script index |
+| Location | Whether in `<head>` or `<body>` |
+| Type | classic, module |
+| Size | Byte size |
+| Parser-Blocking | Blocks HTML parsing if Yes |
+| Pattern | Detected pattern (Analytics, Config, Globals) |
+| Preview | First 80 characters |
+
+**JSON-LD Section:**
+- Structured data scripts for SEO
+- Schema type detected from content
+
+**Issues Detected:**
+
+| Issue | Why It Matters |
+|-------|----------------|
+| Parser-blocking in `<head>` | Delays all content below the script |
+| Large scripts (> 2 KB) | Should be external for caching |
+| Duplicate scripts | Wasted bytes, potential conflicts |
+| Analytics blocking in `<head>` | Analytics should never block rendering |
+
+### Parser-Blocking vs Non-Blocking
+
+```
+Parser-Blocking (bad in <head>):
+<script>/* code */</script>
+
+Non-Blocking alternatives:
+<script defer>/* code */</script>      ← Deferred execution
+<script type="module">/* code */</script>  ← Modules are deferred
+<script async>/* code */</script>      ← Async execution
+```
+
+### Further Reading
+
+- [Efficiently load JavaScript](https://web.dev/articles/efficiently-load-third-party-javascript) | web.dev
+- [Remove render-blocking resources](https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources) | Chrome Developers
+- [Script loading strategies](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_is_JavaScript#script_loading_strategies) | MDN
+- [JSON-LD structured data](https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data) | Google Developers

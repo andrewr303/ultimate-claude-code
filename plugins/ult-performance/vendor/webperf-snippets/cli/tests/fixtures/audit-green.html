@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Green — No Violations</title>
+  <!-- Inline styles only: no render-blocking external CSS -->
+  <style>body { margin: 0; font-family: sans-serif; }</style>
+  <!-- No resource hints: nothing unused to flag -->
+  <!-- No preloaded scripts: no anti-patterns -->
+</head>
+<body>
+  <!-- Above-fold hero: correct fetchpriority, no lazy -->
+  <img src="/hero.gif" width="300" height="200" alt="hero" fetchpriority="high">
+
+  <!-- Below-fold images: all properly lazy-loaded -->
+  <div style="margin-top: 2000px;">
+    <img src="/below1.gif" loading="lazy" width="100" height="100" alt="below fold 1">
+    <img src="/below2.gif" loading="lazy" width="100" height="100" alt="below fold 2">
+  </div>
+</body>
+</html>

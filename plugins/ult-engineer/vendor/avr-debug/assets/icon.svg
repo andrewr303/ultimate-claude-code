@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">AVR Debug icon</title>
+  <desc id="desc">A geometric AVR Debug monogram in the Codex Plugin Lab visual system.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#060A12"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0ECFE0"/>
+      <stop offset="1" stop-color="#7DD3FC"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".5"/>
+    </filter>
+  </defs>
+  <rect x="5" y="5" width="118" height="118" rx="27" fill="url(#bg)" stroke="#334155" stroke-width="2" filter="url(#shadow)"/>
+  <path d="M18 40 H110 M40 18 V110" stroke="#0ECFE0" stroke-opacity=".16" stroke-width="1"/>
+  <g transform="rotate(-16 64 64)">
+    <path d="M64 22 100 43v42L64 106 28 85V43z" fill="none" stroke="url(#accent)" stroke-width="3"/>
+    <path d="M64 31 92 47v34L64 97 36 81V47z" fill="#0ECFE0" fill-opacity=".08" stroke="#0ECFE0" stroke-opacity=".32"/>
+  </g>
+  <circle cx="103" cy="25" r="4" fill="#0ECFE0"/>
+  <circle cx="25" cy="103" r="3" fill="#0ECFE0" fill-opacity=".65"/>
+  <text x="64" y="74" text-anchor="middle" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="29" font-weight="750" letter-spacing="-1">AD</text>
+</svg>

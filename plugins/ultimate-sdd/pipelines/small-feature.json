@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "name": "small-feature",
+  "description": "Propose with proportionate design, apply with per-task TDD, verify and ordered independent review, retain, archive. Default pipeline.",
+  "stages": [
+    {"id": "propose", "skill": "plan-propose", "role": "planner", "requires": [], "gate": true},
+    {"id": "apply", "skill": "plan-apply", "role": "implementer", "requires": ["propose"], "gate": true},
+    {"id": "verify", "skill": "task-verify", "role": "reviewer", "requires": ["apply"]},
+    {"id": "review-loop", "skill": "plan-review", "role": "fixer", "requires": ["verify"], "loop": {"kind": "review-cycle", "maxRounds": 3}},
+    {"id": "retain", "skill": "plan-retain", "role": "reviewer", "requires": ["review-loop"]},
+    {"id": "archive", "skill": "plan-archive", "role": "shipper", "requires": ["retain"]}
+  ]
+}

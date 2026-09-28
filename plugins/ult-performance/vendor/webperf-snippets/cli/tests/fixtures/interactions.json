@@ -1,0 +1,6 @@
+{
+  "interactions": [
+    { "action": "scroll", "y": 200 },
+    { "action": "wait", "ms": 50 }
+  ]
+}

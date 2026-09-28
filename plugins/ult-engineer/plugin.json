@@ -1,0 +1,7 @@
+{
+  "name": "ult-engineer",
+  "version": "1.0.0",
+  "description": "Ultimate TypeScript, React, and Node.js engineering plugin: write, debug, refactor, review, and health-audit code.",
+  "license": "MIT",
+  "skills": "./skills/"
+}

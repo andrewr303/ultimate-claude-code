@@ -1,0 +1,60 @@
+{
+  "name": "avr-debug",
+  "version": "1.0.0",
+  "description": "An all-in-one debugging and code-health suite combining interactive DAP debugging, evidence-based log instrumentation, browser performance tracing, TypeScript diagnostics, Semgrep and OpenRewrite passes, and a full code-quality scanner bench.",
+  "author": {
+    "name": "Andrew Rodriguez"
+  },
+  "license": "MIT",
+  "keywords": [
+    "debugging",
+    "dap",
+    "breakpoints",
+    "runtime-evidence",
+    "instrumentation",
+    "web-performance",
+    "code-quality",
+    "code-review",
+    "refactoring",
+    "linting",
+    "ast-grep",
+    "semgrep",
+    "taint-analysis",
+    "openrewrite",
+    "migrations",
+    "anti-patterns",
+    "hidden-failures",
+    "dead-code",
+    "dependency-audit",
+    "test-quality",
+    "complexity",
+    "typescript",
+    "nodejs",
+    "sentry",
+    "knip"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "AVR Debug",
+    "shortDescription": "Debug with runtime evidence and keep the whole codebase healthy.",
+    "longDescription": "An all-in-one debugging and code-health suite combining interactive DAP debugging, evidence-based log instrumentation, browser performance tracing, TypeScript diagnostics, Semgrep and OpenRewrite passes, and a full code-quality scanner bench.",
+    "category": "Engineering & developer tools",
+    "capabilities": [
+      "Interactive DAP debugging",
+      "Evidence-based instrumentation",
+      "Code-health scanner bench",
+      "Semgrep & OpenRewrite passes"
+    ],
+    "brandColor": "#0ECFE0",
+    "logo": "./assets/icon.svg",
+    "composerIcon": "./assets/icon.svg",
+    "developerName": "Andrew Rodriguez",
+    "defaultPrompt": [
+      "Use $avr-debug to debug this failure with runtime evidence.",
+      "Use $avr-debug to run a full code-health sweep on this repo.",
+      "Use $avr-debug to step through this crash with the dap debugger.",
+      "Use $avr-debug to hunt hidden failures, dead code, and anti-patterns."
+    ]
+  }
+}

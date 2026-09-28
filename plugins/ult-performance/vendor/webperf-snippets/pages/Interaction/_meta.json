@@ -1,0 +1,11 @@
+{
+  "Interactions": "Interactions",
+  "Input-Latency-Breakdown": "Input Latency Breakdown",
+  "Layout-Shift-Loading-and-Interaction": "Layout Shift Loading and Interaction",
+  "Long-Animation-Frames": "Long Animation Frames",
+  "Long-Animation-Frames-Script-Attribution": "Long Animation Frames Script Attribution",
+  "Long-Animation-Frames-Helpers": "Long Animation Frames Helpers",
+  "LongTask": "Long Task",
+  "Scroll-Performance": "Scroll Performance",
+  "Forced-Synchronous-Layout": "Forced Synchronous Layout"
+}

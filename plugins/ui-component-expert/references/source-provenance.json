@@ -1,0 +1,1079 @@
+{
+  "manifestVersion": "1.0.0",
+  "plugin": "ui-component-expert",
+  "pluginVersion": "0.1.0",
+  "generatedAt": "2026-09-27T22:16:19.316Z",
+  "description": "Curated source provenance manifest tracking exact origins, licenses, versions, SHA256 hashes, and selection rationale for all reference assets imported into ui-component-expert.",
+  "rootSkillDeduplication": {
+    "sourcePath": "SKILL (18).md",
+    "sha256": "e35325764a67028e7a92585303dbcd0ee90894933bdf92989e907c2041eb8fd6",
+    "identicalTo": "ux-ui-agent-skills-main/.claude/skills/design-component/SKILL.md",
+    "identicalSha256": "e35325764a67028e7a92585303dbcd0ee90894933bdf92989e907c2041eb8fd6",
+    "status": "DEDUPLICATED",
+    "action": "Preserved original SKILL (18).md intact on disk. Deduplicated in plugin reference graph to point to canonical ux-ui-agent-skills snapshot to prevent competing skills.",
+    "license": "MIT",
+    "licenseHolder": "Thientan Soparat"
+  },
+  "sources": {
+    "base-ui-master": {
+      "sourceId": "base-ui-master",
+      "upstreamName": "@base-ui/monorepo",
+      "version": "1.8.0",
+      "capturedDate": "2026-09-25",
+      "license": "MIT",
+      "licenseHolder": "Material-UI SAS",
+      "selectionReason": "Unstyled accessible React primitives reference for overlays, popovers, dropdowns, dialogs, sliders, and switches. Serves as default composite widget primitive engine without visual lock-in.",
+      "fileCount": 13,
+      "files": [
+        {
+          "originalRelativePath": "base-ui-master/README.md",
+          "snapshotPath": "references/upstream/base-ui-master/README.md",
+          "sha256": "8122d231cd78683c8c36b12e97756de09a6705a3161d19f6455a7fa4f8c8dc3c",
+          "sizeBytes": 1433,
+          "license": "MIT",
+          "selectionReason": "Monorepo overview, architecture, and package structure"
+        },
+        {
+          "originalRelativePath": "base-ui-master/LICENSE",
+          "snapshotPath": "references/upstream/base-ui-master/LICENSE",
+          "sha256": "07fc1b39d69d14bc7d40482a628f47226258eb01265db68ae684944b916beb2a",
+          "sizeBytes": 1072,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "base-ui-master/packages/react/README.md",
+          "snapshotPath": "references/upstream/base-ui-master/packages/react/README.md",
+          "sha256": "b5444513c6b8cd0d19777a7c7f0031c8f7d287e5ce04093b5ca68e50cab791c6",
+          "sizeBytes": 1856,
+          "license": "MIT",
+          "selectionReason": "React package installation, usage, and component catalog"
+        },
+        {
+          "originalRelativePath": "base-ui-master/docs/src/app/(docs)/react/components/dialog/page.mdx",
+          "snapshotPath": "references/upstream/base-ui-master/docs/src/app/(docs)/react/components/dialog/page.mdx",
+          "sha256": "723e0168f0d1e436acdb0503d6b8b378c6d507f0250452829ed53bc733c39e7b",
+          "sizeBytes": 10538,
+          "license": "MIT",
+          "selectionReason": "Dialog primitive documentation, anatomy, and accessibility contracts"
+        },
+        {
+          "originalRelativePath": "base-ui-master/docs/src/app/(docs)/react/components/popover/page.mdx",
+          "snapshotPath": "references/upstream/base-ui-master/docs/src/app/(docs)/react/components/popover/page.mdx",
+          "sha256": "68d62847e67ae00d6dfb9c28cd3b0278f056bcd36f616d1851a1355ef8fd25e6",
+          "sizeBytes": 8663,
+          "license": "MIT",
+          "selectionReason": "Popover primitive documentation, positioning, and keyboard interaction"
+        },
+        {
+          "originalRelativePath": "base-ui-master/docs/src/app/(docs)/react/components/select/page.mdx",
+          "snapshotPath": "references/upstream/base-ui-master/docs/src/app/(docs)/react/components/select/page.mdx",
+          "sha256": "da258722f0d62e1391c189a2ae7f1a433b723efbc91fb4028ef41f4ef77d26cd",
+          "sizeBytes": 10227,
+          "license": "MIT",
+          "selectionReason": "Select primitive documentation, keyboard navigation, and slot structure"
+        },
+        {
+          "originalRelativePath": "base-ui-master/docs/src/app/(docs)/react/components/switch/page.mdx",
+          "snapshotPath": "references/upstream/base-ui-master/docs/src/app/(docs)/react/components/switch/page.mdx",
+          "sha256": "08644d550caf4a0f033b1c5ef9822bd09d902287dcc5ab40e06c14ea573a9deb",
+          "sizeBytes": 2651,
+          "license": "MIT",
+          "selectionReason": "Switch primitive documentation, state management, and ARIA attributes"
+        },
+        {
+          "originalRelativePath": "base-ui-master/docs/src/app/(docs)/react/components/accordion/page.mdx",
+          "snapshotPath": "references/upstream/base-ui-master/docs/src/app/(docs)/react/components/accordion/page.mdx",
+          "sha256": "1a8debf489b9bcdbb7c7ffd04153ae81d36738570adfd7782468e5773007b1c4",
+          "sizeBytes": 2343,
+          "license": "MIT",
+          "selectionReason": "Accordion primitive documentation, multi-expansion, and keyboard rules"
+        },
+        {
+          "originalRelativePath": "base-ui-master/packages/react/src/dialog/index.ts",
+          "snapshotPath": "references/upstream/base-ui-master/packages/react/src/dialog/index.ts",
+          "sha256": "2f1cfaab09755ec435cd7902727a2b9355855cc23685ab092ebbc3ff9badd637",
+          "sizeBytes": 448,
+          "license": "MIT",
+          "selectionReason": "Dialog TypeScript API export signatures and component types"
+        },
+        {
+          "originalRelativePath": "base-ui-master/packages/react/src/popover/index.ts",
+          "snapshotPath": "references/upstream/base-ui-master/packages/react/src/popover/index.ts",
+          "sha256": "cb9cbed44b7dc8563bfea3d543c2fb3dcdcce86d6ae345b0a3eb113a013d139e",
+          "sizeBytes": 554,
+          "license": "MIT",
+          "selectionReason": "Popover TypeScript API export signatures and component types"
+        },
+        {
+          "originalRelativePath": "base-ui-master/packages/react/src/select/index.ts",
+          "snapshotPath": "references/upstream/base-ui-master/packages/react/src/select/index.ts",
+          "sha256": "afeaf4ea32a0d01812ccdc3656530b02b9f52912e93b57381c8c86b176fb8eee",
+          "sizeBytes": 937,
+          "license": "MIT",
+          "selectionReason": "Select TypeScript API export signatures and component types"
+        },
+        {
+          "originalRelativePath": "base-ui-master/packages/react/src/switch/index.ts",
+          "snapshotPath": "references/upstream/base-ui-master/packages/react/src/switch/index.ts",
+          "sha256": "65c5924b60bb9c0e103c04e2e84ecc907005851d1870faa49b36456a1e64a3f4",
+          "sizeBytes": 124,
+          "license": "MIT",
+          "selectionReason": "Switch TypeScript API export signatures and component types"
+        },
+        {
+          "originalRelativePath": "base-ui-master/packages/react/src/accordion/index.ts",
+          "snapshotPath": "references/upstream/base-ui-master/packages/react/src/accordion/index.ts",
+          "sha256": "55c7292748caa6620b9a9a65c1dace91a0e76a13bae2308580c2a3acde88538c",
+          "sizeBytes": 272,
+          "license": "MIT",
+          "selectionReason": "Accordion TypeScript API export signatures and component types"
+        }
+      ]
+    },
+    "react-spectrum-main": {
+      "sourceId": "react-spectrum-main",
+      "upstreamName": "react-spectrum-monorepo",
+      "version": "2.21.0-beta.0",
+      "capturedDate": "2026-09-25",
+      "license": "Apache-2.0",
+      "licenseHolder": "Adobe Inc.",
+      "selectionReason": "React Aria accessible hooks and React Stately state controllers for internationalization, localized date/number formatting, virtualized lists, and comboboxes. Excludes styled Adobe Spectrum visual layer.",
+      "fileCount": 11,
+      "files": [
+        {
+          "originalRelativePath": "react-spectrum-main/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/README.md",
+          "sha256": "f960a969da920635c343031a31170ece94521e4865c12fb79ecbb7e5b4b73936",
+          "sizeBytes": 4483,
+          "license": "Apache-2.0",
+          "selectionReason": "Repository overview and architecture of React Aria and Stately"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/LICENSE",
+          "snapshotPath": "references/upstream/react-spectrum-main/LICENSE",
+          "sha256": "7dfe6526888bac51759c99f9a51262ba2711a8c12a067f2181609dd9a4066b84",
+          "sizeBytes": 11335,
+          "license": "Apache-2.0",
+          "selectionReason": "Upstream Apache 2.0 license notice"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-aria/dialog/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-aria/dialog/README.md",
+          "sha256": "2ae8202bc6fceb72dbb31263f25fa6e33e0ac609584d80e34a3d52d5bfed3d94",
+          "sizeBytes": 136,
+          "license": "Apache-2.0",
+          "selectionReason": "React Aria useDialog hook documentation and focus trapping behavior"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-aria/combobox/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-aria/combobox/README.md",
+          "sha256": "7149545d4c683c284c020dd2d9df3233f76458245305d5aa9273539f5079f4ed",
+          "sizeBytes": 138,
+          "license": "Apache-2.0",
+          "selectionReason": "React Aria useComboBox hook documentation, keyboard navigation, and ARIA relationships"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-aria/i18n/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-aria/i18n/README.md",
+          "sha256": "3fe6581b21737156957865c568e1ebf3a446dc68839815b5b0afc43683e3a91b",
+          "sizeBytes": 134,
+          "license": "Apache-2.0",
+          "selectionReason": "React Aria internationalization, RTL detection, and locale provider patterns"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-aria/focus/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-aria/focus/README.md",
+          "sha256": "2533b3165d90adb9e879df59dd93ccbadb37fbd28022d99363360c7b72781c74",
+          "sizeBytes": 135,
+          "license": "Apache-2.0",
+          "selectionReason": "React Aria focus containment, focus ring indicators, and focus restoration"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-aria/table/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-aria/table/README.md",
+          "sha256": "8bc98a0372f478b59ca79e9d638fc14aa14db576079ac0a7c35a1cd65f81e027",
+          "sizeBytes": 135,
+          "license": "Apache-2.0",
+          "selectionReason": "React Aria accessible table, row selection, sorting, and cell navigation hooks"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-aria/overlays/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-aria/overlays/README.md",
+          "sha256": "c23294b4b0329c593f61443c6e9e9ffa3fbc5f44621c668cafe77b0315a39b08",
+          "sizeBytes": 138,
+          "license": "Apache-2.0",
+          "selectionReason": "React Aria overlay positioning, dismissal, and scroll lock behavior"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-stately/combobox/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-stately/combobox/README.md",
+          "sha256": "3d9732fdb47932d45e8b38d852d65006089059c310ff285b4384609e85e9dd89",
+          "sizeBytes": 141,
+          "license": "Apache-2.0",
+          "selectionReason": "React Stately combobox state management, filtering, and selection state"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-stately/table/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-stately/table/README.md",
+          "sha256": "c3ead741e435426a1bb302be5ae150add235f2e731ccddda25af21c4e57af5e3",
+          "sizeBytes": 138,
+          "license": "Apache-2.0",
+          "selectionReason": "React Stately table collection and selection state machine"
+        },
+        {
+          "originalRelativePath": "react-spectrum-main/packages/@react-stately/overlays/README.md",
+          "snapshotPath": "references/upstream/react-spectrum-main/packages/@react-stately/overlays/README.md",
+          "sha256": "a0156bd30b880da42c90bdda5270643b31d8a8be9b359b2f02e36a168bcdeacd",
+          "sizeBytes": 141,
+          "license": "Apache-2.0",
+          "selectionReason": "React Stately overlay trigger state and visibility controllers"
+        }
+      ]
+    },
+    "zag-main": {
+      "sourceId": "zag-main",
+      "upstreamName": "@zag-js/org",
+      "version": "1.44.0",
+      "capturedDate": "2026-09-25",
+      "license": "MIT",
+      "licenseHolder": "Chakra UI",
+      "selectionReason": "Finite state machines for complex multi-step interactive widgets, cross-framework logic coordination, and nested controls (combobox, dialog, menu, tabs, accordion).",
+      "fileCount": 8,
+      "files": [
+        {
+          "originalRelativePath": "zag-main/README.md",
+          "snapshotPath": "references/upstream/zag-main/README.md",
+          "sha256": "0b76444c75c39b0152a8613093c5731682df0ba4bcb88c72535ac845e709a414",
+          "sizeBytes": 7115,
+          "license": "MIT",
+          "selectionReason": "Zag state machine architecture and framework adapter model"
+        },
+        {
+          "originalRelativePath": "zag-main/LICENSE",
+          "snapshotPath": "references/upstream/zag-main/LICENSE",
+          "sha256": "2e9d3d03c7f5bd727f8e53dda3795edc0873e6479d0cb32225b9390c1db72433",
+          "sizeBytes": 1066,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "zag-main/packages/machines/dialog/README.md",
+          "snapshotPath": "references/upstream/zag-main/packages/machines/dialog/README.md",
+          "sha256": "0cf1917a1812c379a737161e34bcc7b83a3470e52036f5093e8878bb4c3dafb2",
+          "sizeBytes": 425,
+          "license": "MIT",
+          "selectionReason": "Dialog finite state machine transitions, focus trapping, and backdrop events"
+        },
+        {
+          "originalRelativePath": "zag-main/packages/machines/combobox/README.md",
+          "snapshotPath": "references/upstream/zag-main/packages/machines/combobox/README.md",
+          "sha256": "200139332e08d6c2d98079c2df08e52900a0bf79b5196c3d6708038b17ae3aeb",
+          "sizeBytes": 433,
+          "license": "MIT",
+          "selectionReason": "Combobox finite state machine states, typing debounce, and virtual list control"
+        },
+        {
+          "originalRelativePath": "zag-main/packages/machines/menu/README.md",
+          "snapshotPath": "references/upstream/zag-main/packages/machines/menu/README.md",
+          "sha256": "48d35cedb80036911a458be71718e87b2f67ab1847053a6885ac4e129a43a1af",
+          "sizeBytes": 417,
+          "license": "MIT",
+          "selectionReason": "Menu finite state machine submenus, hover intent, and keyboard shortcuts"
+        },
+        {
+          "originalRelativePath": "zag-main/packages/machines/popover/README.md",
+          "snapshotPath": "references/upstream/zag-main/packages/machines/popover/README.md",
+          "sha256": "d3809ff7463f94ec374a2f050d0f0880d72f8a87f13c1bfa0f4901b9c3089b15",
+          "sizeBytes": 429,
+          "license": "MIT",
+          "selectionReason": "Popover finite state machine anchor positioning and outside click dismissal"
+        },
+        {
+          "originalRelativePath": "zag-main/packages/machines/tabs/README.md",
+          "snapshotPath": "references/upstream/zag-main/packages/machines/tabs/README.md",
+          "sha256": "4394ba2aaab6c4b3cf41eea1076a7b28f97c8eda907b717840edc773062a81f0",
+          "sizeBytes": 417,
+          "license": "MIT",
+          "selectionReason": "Tabs finite state machine orientation, manual vs automatic activation, and tab panel bindings"
+        },
+        {
+          "originalRelativePath": "zag-main/packages/machines/accordion/README.md",
+          "snapshotPath": "references/upstream/zag-main/packages/machines/accordion/README.md",
+          "sha256": "4d033ed54607cb803767e0e2c58ff1c7ded34eb9f5ae7845ff476cd41545c9a3",
+          "sizeBytes": 437,
+          "license": "MIT",
+          "selectionReason": "Accordion finite state machine multiple/collapsible state transitions"
+        }
+      ]
+    },
+    "design-system-ops-main": {
+      "sourceId": "design-system-ops-main",
+      "upstreamName": "design-system-ops",
+      "version": "MISSING_NOT_CLAIMED",
+      "capturedDate": "2026-09-24",
+      "license": "MIT",
+      "licenseHolder": "Murphy Trueman",
+      "selectionReason": "Design-to-code lifecycle contracts, 3-tier token architecture (primitive -> semantic -> component), and API governance. Full recursive knowledge notes graph preserved.",
+      "fileCount": 19,
+      "files": [
+        {
+          "originalRelativePath": "design-system-ops-main/README.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/README.md",
+          "sha256": "6a38e4f09e0526ee709988a939af9be9e107d9a9b6644eb3fea511ccdf8a3c02",
+          "sizeBytes": 13684,
+          "license": "MIT",
+          "selectionReason": "System overview, governance model, and operational tooling"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/LICENSE",
+          "snapshotPath": "references/upstream/design-system-ops-main/LICENSE",
+          "sha256": "f6e9d262ea8e219c550707bf0beb00d34e698bc3c74083a6851cb7b7f038eb39",
+          "sizeBytes": 1071,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/skills/design-to-code-check/SKILL.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/skills/design-to-code-check/SKILL.md",
+          "sha256": "5211373d2222d8446c8d95eef5747be3d526001bbc5cdcf7a6b7825d8414744e",
+          "sizeBytes": 16031,
+          "license": "MIT",
+          "selectionReason": "Design-to-code automated verification skill and parity rules"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/skills/component-api-validator/SKILL.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/skills/component-api-validator/SKILL.md",
+          "sha256": "000441176c2bf83c68bc4a6bf5945e5e5553c95ef3422eeea3e1ac8f530f55d4",
+          "sizeBytes": 17420,
+          "license": "MIT",
+          "selectionReason": "Component prop interface and API validation skill"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/skills/token-compliance/SKILL.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/skills/token-compliance/SKILL.md",
+          "sha256": "05df3ac477af35c0e0349791478016a328b3ae3654602d773843318f9c8479f2",
+          "sizeBytes": 23360,
+          "license": "MIT",
+          "selectionReason": "Token compliance audit skill and hardcoded value detection"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/skills/accessibility-per-component/SKILL.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/skills/accessibility-per-component/SKILL.md",
+          "sha256": "59d2d1c9ec57139c9d93053764a92f3c9bcf220f823da95c35359cbdd0af8599",
+          "sizeBytes": 24176,
+          "license": "MIT",
+          "selectionReason": "Component-level accessibility audit checklist skill"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/design-to-code-contract.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/design-to-code-contract.md",
+          "sha256": "adaabbd202a807012ebe3803e213758b9814b90130469844a5893b80c4a2ae40",
+          "sizeBytes": 9541,
+          "license": "MIT",
+          "selectionReason": "Canonical design-to-code contract specification"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/token-architecture.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/token-architecture.md",
+          "sha256": "84d3f22080cd470e2bf7efde2a5c2b47b3e574b424b115ebcb365ef5a8848062",
+          "sizeBytes": 12053,
+          "license": "MIT",
+          "selectionReason": "Three-tier token architecture reference"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/component-governance.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/component-governance.md",
+          "sha256": "48ec53c17083d6fc89c53dc3e9c0947239db7aba9ec3f1c1ea4da54eba15b623",
+          "sizeBytes": 11563,
+          "license": "MIT",
+          "selectionReason": "Component lifecycle, deprecation, and versioning governance"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/component-bestiary-reference.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/component-bestiary-reference.md",
+          "sha256": "066d23fdab57ba8535829ae9739632a6de0bb81ef6e9203c4bfec9f922958159",
+          "sizeBytes": 6906,
+          "license": "MIT",
+          "selectionReason": "Component catalog and taxonomy reference"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/adoption-measurement.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/adoption-measurement.md",
+          "sha256": "b406cf02e4e954af37aba794897e64449f745f51698d3fc1eb3d9c9724323a93",
+          "sizeBytes": 5251,
+          "license": "MIT",
+          "selectionReason": "System adoption and drift tracking methodology"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/agent-orchestration-guide.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/agent-orchestration-guide.md",
+          "sha256": "53734b7e4dbe58443a48993de6f19f07a836e11b5efcaa2113fcadb7c83a9cf8",
+          "sizeBytes": 16487,
+          "license": "MIT",
+          "selectionReason": "Agent delegation and coordination patterns"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/ai-readiness.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/ai-readiness.md",
+          "sha256": "cc5cb0582578581a9ce0fd769875608c5d10f36c5135d045ebaa205c7ea73014",
+          "sizeBytes": 19026,
+          "license": "MIT",
+          "selectionReason": "AI-assisted design system engineering practices"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/configuration-and-recurring.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/configuration-and-recurring.md",
+          "sha256": "17ef7de06ad1492843f428a90c136110e2adfcb16be0351e3bff40ab45c5d0b3",
+          "sizeBytes": 6255,
+          "license": "MIT",
+          "selectionReason": "System recurring checks and automation config"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/documentation-coverage.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/documentation-coverage.md",
+          "sha256": "16ada158bc9d19fc05e9748484af3d7a809c665f663ffe389356242b10162347",
+          "sizeBytes": 8182,
+          "license": "MIT",
+          "selectionReason": "Documentation coverage standards and completeness metrics"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/executive-communication.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/executive-communication.md",
+          "sha256": "e092b52f7f3a73a32c9e86996fd34b475d78c62129ad57690b1fb90597f15b78",
+          "sizeBytes": 10496,
+          "license": "MIT",
+          "selectionReason": "Reporting and stakeholder communication frameworks"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/mcp-setup-guide.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/mcp-setup-guide.md",
+          "sha256": "c80f96222a1f5d837565ab20f2b205f3c683d5ba699b6b41e018f5224743a48d",
+          "sizeBytes": 15691,
+          "license": "MIT",
+          "selectionReason": "Tool setup and environment integration guide"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/output-discipline.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/output-discipline.md",
+          "sha256": "0604d7bf5abdb3cee4c82610b1f196f84d30164aa8a2c7ca06afc56b92c3ffb9",
+          "sizeBytes": 12640,
+          "license": "MIT",
+          "selectionReason": "Deterministic artifact output and formatting rules"
+        },
+        {
+          "originalRelativePath": "design-system-ops-main/knowledge-notes/public-systems-reference.md",
+          "snapshotPath": "references/upstream/design-system-ops-main/knowledge-notes/public-systems-reference.md",
+          "sha256": "d6f5bf2de5b7a35eeb3b81d957194a59c81b0cbae0175e64e074c4648718481f",
+          "sizeBytes": 7440,
+          "license": "MIT",
+          "selectionReason": "Benchmarking against tier-1 industry design systems"
+        }
+      ]
+    },
+    "interface-design-main": {
+      "sourceId": "interface-design-main",
+      "upstreamName": "interface-design",
+      "version": "MISSING_NOT_CLAIMED",
+      "capturedDate": "2026-06-20",
+      "license": "MIT",
+      "licenseHolder": "Damola Akinleye",
+      "selectionReason": "Product UI craft, visual hierarchy, typography scale, information density, and .interface-design/system.md memory patterns for dashboards and settings.",
+      "fileCount": 5,
+      "files": [
+        {
+          "originalRelativePath": "interface-design-main/README.md",
+          "snapshotPath": "references/upstream/interface-design-main/README.md",
+          "sha256": "0673dd349234afd119bda38977cdd3a4fc8837fdc67f34b39460fb5550d20739",
+          "sizeBytes": 11262,
+          "license": "MIT",
+          "selectionReason": "Product interface craft philosophy and guidelines"
+        },
+        {
+          "originalRelativePath": "interface-design-main/LICENSE",
+          "snapshotPath": "references/upstream/interface-design-main/LICENSE",
+          "sha256": "54c405ef24e71634b73c994133d028e7a96d1906f42615366296d6583dcaba8f",
+          "sizeBytes": 1072,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "interface-design-main/.claude/skills/interface-design/SKILL.md",
+          "snapshotPath": "references/upstream/interface-design-main/.claude/skills/interface-design/SKILL.md",
+          "sha256": "720b31a31276e899fbe3006a33cbfeaceb77a73ba4c27b80d29afd38c8b7b208",
+          "sizeBytes": 29614,
+          "license": "MIT",
+          "selectionReason": "Interface design skill specification and visual craft rules"
+        },
+        {
+          "originalRelativePath": "interface-design-main/.claude/commands/design-review.md",
+          "snapshotPath": "references/upstream/interface-design-main/.claude/commands/design-review.md",
+          "sha256": "dfa72fb496107a20174f45b1e7b3651c5214b4bd61276ba4b9d723a6e1a5362f",
+          "sizeBytes": 10867,
+          "license": "MIT",
+          "selectionReason": "Design review command workflow and rubric"
+        },
+        {
+          "originalRelativePath": "interface-design-main/.claude/commands/design-deslop.md",
+          "snapshotPath": "references/upstream/interface-design-main/.claude/commands/design-deslop.md",
+          "sha256": "46e8a7ead38c6ec08093fc8f734d742088e9f7b2225dc4ee938ddc930be316af",
+          "sizeBytes": 7519,
+          "license": "MIT",
+          "selectionReason": "Anti-template deslop command workflow"
+        }
+      ]
+    },
+    "styleseed-main": {
+      "sourceId": "styleseed-main",
+      "upstreamName": "styleseed",
+      "version": "MISSING_NOT_CLAIMED",
+      "capturedDate": "2026-09-26",
+      "license": "MIT",
+      "licenseHolder": "StyleSeed Contributors",
+      "selectionReason": "Design reference evidence compilation into project-local grammar. Invariant: engine/.claude/skills/ is canonical; adapts tokens to target stack while preserving local target identity.",
+      "fileCount": 12,
+      "files": [
+        {
+          "originalRelativePath": "styleseed-main/README.md",
+          "snapshotPath": "references/upstream/styleseed-main/README.md",
+          "sha256": "62d3f1be29f6281c44b87ca07e09e893a7b410f22a268fa2a2cd0357c878ad75",
+          "sizeBytes": 50765,
+          "license": "MIT",
+          "selectionReason": "StyleSeed engine architecture and project overview"
+        },
+        {
+          "originalRelativePath": "styleseed-main/LICENSE",
+          "snapshotPath": "references/upstream/styleseed-main/LICENSE",
+          "sha256": "2de9d43f4c5a690a3a8e01a58fd906c259f2b70e7903805b702982ec52f23b43",
+          "sizeBytes": 1079,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "styleseed-main/AGENTS.md",
+          "snapshotPath": "references/upstream/styleseed-main/AGENTS.md",
+          "sha256": "29ab8cd446f173d872fe9cbdf6a7c589cf205dc8be28d89edc1ce4b9e691aeb1",
+          "sizeBytes": 3486,
+          "license": "MIT",
+          "selectionReason": "Canonical architectural instructions and registry-first invariant"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/.claude/skills/ss-reference/SKILL.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/.claude/skills/ss-reference/SKILL.md",
+          "sha256": "383f8d2a755f1a2766b6da4a43fd355295d279432603808ca4a902641e7d6056",
+          "sizeBytes": 2927,
+          "license": "MIT",
+          "selectionReason": "Canonical ss-reference skill for compiling references into grammar"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/.claude/skills/ss-component/SKILL.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/.claude/skills/ss-component/SKILL.md",
+          "sha256": "b9d0a6d93cedba34bdef40acda8aa1226b0d9fb7ee6a3f9be52d79816095bd44",
+          "sizeBytes": 5212,
+          "license": "MIT",
+          "selectionReason": "Canonical ss-component skill for generating components to project spec"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/PRODUCT-PRINCIPLES.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/PRODUCT-PRINCIPLES.md",
+          "sha256": "16ba3f07c940dc0a5e96524e712b668df4f731ffffe4b5c42b2222d195a341f2",
+          "sizeBytes": 7969,
+          "license": "MIT",
+          "selectionReason": "Core product design and engineering principles"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/RULESETS.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/RULESETS.md",
+          "sha256": "7ef0d0286f1b80c0069f931bdbc62ea63fa6fe68f416d5a0c977723f59c0c270",
+          "sizeBytes": 10680,
+          "license": "MIT",
+          "selectionReason": "Grammar rulesets and design dimension axes"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/ADAPTERS.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/ADAPTERS.md",
+          "sha256": "5c21aeb3b8fd1fb98e5cda97d75ee72785e0e9fc9ce1d135fd3abf9c72a8bed7",
+          "sizeBytes": 7101,
+          "license": "MIT",
+          "selectionReason": "Framework and styling adapter contracts"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/REFERENCE-COMPILER.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/REFERENCE-COMPILER.md",
+          "sha256": "17cced4ab383ceda245c094ae457d9ca29b98155d00c4c68d8bd5958e1855e82",
+          "sizeBytes": 3737,
+          "license": "MIT",
+          "selectionReason": "Compiler pipeline specification for reference extraction"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/CRAFT-BASELINE.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/CRAFT-BASELINE.md",
+          "sha256": "6b5ac0ee36ae20654d421ac71c373cfe63dbbd626082b62dbe17584fc87f3aa1",
+          "sizeBytes": 3565,
+          "license": "MIT",
+          "selectionReason": "Baseline visual and interaction craft standards"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/DESIGN-LANGUAGE.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/DESIGN-LANGUAGE.md",
+          "sha256": "d38a33f86be228caf3f55ac79ec204e9bb5839d139f0400b9cfbcffc07b9a4ab",
+          "sizeBytes": 107295,
+          "license": "MIT",
+          "selectionReason": "Design tokens and semantic styling vocabulary"
+        },
+        {
+          "originalRelativePath": "styleseed-main/engine/BRAND-RECIPES.md",
+          "snapshotPath": "references/upstream/styleseed-main/engine/BRAND-RECIPES.md",
+          "sha256": "c942ad7138e00659c757ae9bedb3fb28775265de77e26f1b31017bce7bf1706f",
+          "sizeBytes": 15861,
+          "license": "MIT",
+          "selectionReason": "Brand styling recipes and personality mappings"
+        }
+      ]
+    },
+    "taste-skill-main": {
+      "sourceId": "taste-skill-main",
+      "upstreamName": "taste-skill",
+      "version": "MISSING_NOT_CLAIMED",
+      "capturedDate": "2026-09-26",
+      "license": "MIT",
+      "licenseHolder": "Leonxlnx",
+      "selectionReason": "Anti-default design inference and Three Dials (variance, motion, density) scoped strictly to public marketing/landing pages. Off-the-shelf component defaults discarded in favor of bespoke craftsmanship.",
+      "fileCount": 6,
+      "files": [
+        {
+          "originalRelativePath": "taste-skill-main/README.md",
+          "snapshotPath": "references/upstream/taste-skill-main/README.md",
+          "sha256": "f73e51ff95ab550ff95d58f04695b1703b7e1ba73d1532322dc4a6f6e97d0907",
+          "sizeBytes": 17499,
+          "license": "MIT",
+          "selectionReason": "Design taste principles and anti-template philosophy"
+        },
+        {
+          "originalRelativePath": "taste-skill-main/LICENSE",
+          "snapshotPath": "references/upstream/taste-skill-main/LICENSE",
+          "sha256": "4575a543ab88dad12ccea7d97e563d0bce5b448b06072e65d3264497dad326df",
+          "sizeBytes": 1065,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "taste-skill-main/skills/taste-skill/SKILL.md",
+          "snapshotPath": "references/upstream/taste-skill-main/skills/taste-skill/SKILL.md",
+          "sha256": "aa194351b246b8b4799099d4ed7b033d29eab6e6e3d58d8d2172978be7b3ec89",
+          "sizeBytes": 87253,
+          "license": "MIT",
+          "selectionReason": "Taste skill v2 specification and Three Dials framework"
+        },
+        {
+          "originalRelativePath": "taste-skill-main/skills/taste-skill-v1/SKILL.md",
+          "snapshotPath": "references/upstream/taste-skill-main/skills/taste-skill-v1/SKILL.md",
+          "sha256": "033d45af1ed23832730642f95f40ab49db7fb5222848489a6c5656144bfc6dae",
+          "sizeBytes": 21195,
+          "license": "MIT",
+          "selectionReason": "Taste skill v1 baseline reference"
+        },
+        {
+          "originalRelativePath": "taste-skill-main/skills/minimalist-skill/SKILL.md",
+          "snapshotPath": "references/upstream/taste-skill-main/skills/minimalist-skill/SKILL.md",
+          "sha256": "36bc7328f085405f43b476938e62460fa573bf7e984e949e072bcf014831a44c",
+          "sizeBytes": 7901,
+          "license": "MIT",
+          "selectionReason": "Minimalist visual identity rules and typography scale"
+        },
+        {
+          "originalRelativePath": "taste-skill-main/skills/brandkit/SKILL.md",
+          "snapshotPath": "references/upstream/taste-skill-main/skills/brandkit/SKILL.md",
+          "sha256": "b0c4837e1bd140ca816ae54948754ddd2ac1e2a4d3619363777a80caf00b2ede",
+          "sizeBytes": 15992,
+          "license": "MIT",
+          "selectionReason": "Brand identity systems and palette composition rules"
+        }
+      ]
+    },
+    "ui-skills-main": {
+      "sourceId": "ui-skills-main",
+      "upstreamName": "ui-skills",
+      "version": "0.2.4",
+      "capturedDate": "2026-09-26",
+      "license": "MIT",
+      "licenseHolder": "Julien Thibeaut",
+      "selectionReason": "Engineering baselines: accessible primitives, visible focus, safe-area mobile layouts, and compositor-only animations. Local registry used as offline reference without remote fetches.",
+      "fileCount": 8,
+      "files": [
+        {
+          "originalRelativePath": "ui-skills-main/README.md",
+          "snapshotPath": "references/upstream/ui-skills-main/README.md",
+          "sha256": "4dc3e9f0216a750d980f55db8412f5c8d656066bc9aadd26deeb8fd4798f991d",
+          "sizeBytes": 691,
+          "license": "MIT",
+          "selectionReason": "UI skills collection overview and registry architecture"
+        },
+        {
+          "originalRelativePath": "ui-skills-main/LICENSE",
+          "snapshotPath": "references/upstream/ui-skills-main/LICENSE",
+          "sha256": "c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b",
+          "sizeBytes": 1072,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "ui-skills-main/AGENTS.md",
+          "snapshotPath": "references/upstream/ui-skills-main/AGENTS.md",
+          "sha256": "295b84a486bf6ffdae850a5667a4e83fb7f4267091704fc1d2f8e67698220345",
+          "sizeBytes": 1652,
+          "license": "MIT",
+          "selectionReason": "Engineering baselines and offline registry rules"
+        },
+        {
+          "originalRelativePath": "ui-skills-main/skills/baseline-ui/SKILL.md",
+          "snapshotPath": "references/upstream/ui-skills-main/skills/baseline-ui/SKILL.md",
+          "sha256": "fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f",
+          "sizeBytes": 3419,
+          "license": "MIT",
+          "selectionReason": "Baseline UI engineering hygiene and layout craft"
+        },
+        {
+          "originalRelativePath": "ui-skills-main/skills/fixing-accessibility/SKILL.md",
+          "snapshotPath": "references/upstream/ui-skills-main/skills/fixing-accessibility/SKILL.md",
+          "sha256": "549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf",
+          "sizeBytes": 4718,
+          "license": "MIT",
+          "selectionReason": "Practical accessibility repair protocols and ARIA validation"
+        },
+        {
+          "originalRelativePath": "ui-skills-main/skills/fixing-motion-performance/SKILL.md",
+          "snapshotPath": "references/upstream/ui-skills-main/skills/fixing-motion-performance/SKILL.md",
+          "sha256": "0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9",
+          "sizeBytes": 5565,
+          "license": "MIT",
+          "selectionReason": "GPU compositor motion optimization and frame-budget rules"
+        },
+        {
+          "originalRelativePath": "ui-skills-main/skills/fixing-metadata/SKILL.md",
+          "snapshotPath": "references/upstream/ui-skills-main/skills/fixing-metadata/SKILL.md",
+          "sha256": "b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547",
+          "sizeBytes": 4439,
+          "license": "MIT",
+          "selectionReason": "Document metadata, head elements, and viewport tags"
+        },
+        {
+          "originalRelativePath": "ui-skills-main/src/data/registry.ts",
+          "snapshotPath": "references/upstream/ui-skills-main/src/data/registry.ts",
+          "sha256": "87a1d319e3c260bbc3cabdf45f619631daf4053db702ad6bf26dbb8c688096c3",
+          "sizeBytes": 182555,
+          "license": "MIT",
+          "selectionReason": "Static offline component registry data"
+        }
+      ]
+    },
+    "ux-ui-agent-skills-main": {
+      "sourceId": "ux-ui-agent-skills-main",
+      "upstreamName": "ux-ui-agent-skills",
+      "version": "2.8.0",
+      "capturedDate": "2026-09-15",
+      "license": "MIT",
+      "licenseHolder": "Thientan Soparat",
+      "selectionReason": "Mandatory 8-state quality bar (default, hover, focus, active, disabled, loading, error, selected), token schemas, state test harnesses, and axe-core accessibility gates.",
+      "fileCount": 37,
+      "files": [
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/README.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/README.md",
+          "sha256": "02cbd759f5fa345adf8b8ef41e3d11e08cdad18d27856f4a0f5415158832ca0b",
+          "sizeBytes": 22283,
+          "license": "MIT",
+          "selectionReason": "Framework overview and component engineering methodology"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/LICENSE",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/LICENSE",
+          "sha256": "c8f168486c91894115315055a08e017cedb41189b331196f879c74b985a51f81",
+          "sizeBytes": 1073,
+          "license": "MIT",
+          "selectionReason": "Upstream MIT license notice"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/.claude/skills/design-component/SKILL.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/.claude/skills/design-component/SKILL.md",
+          "sha256": "e35325764a67028e7a92585303dbcd0ee90894933bdf92989e907c2041eb8fd6",
+          "sizeBytes": 10253,
+          "license": "MIT",
+          "selectionReason": "8-state component design skill and contract specification"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/atoms.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/atoms.md",
+          "sha256": "1acca8738021a176cbb3f642a061fa131be23e60ce21e78d3438bddeea777dd7",
+          "sizeBytes": 7595,
+          "license": "MIT",
+          "selectionReason": "Atomic component anatomy and state definitions"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/molecules.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/molecules.md",
+          "sha256": "f2573b0e1d59604ddb52296c74fd7f436b09ba77ae1c808eb2ff0268348307ea",
+          "sizeBytes": 10323,
+          "license": "MIT",
+          "selectionReason": "Molecular component composition and keyboard rules"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/organisms.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/organisms.md",
+          "sha256": "f23072edd1ca4b43493d3fe9bbfafae6e5a5c9a8e6237cd4872101aa2d0d9e07",
+          "sizeBytes": 14751,
+          "license": "MIT",
+          "selectionReason": "Complex organism layout and state propagation"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/overlays.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/overlays.md",
+          "sha256": "c7d38a362ff957095679873a83d7e94b11134275875a100da6f60d4b2f9d7b5d",
+          "sizeBytes": 2644,
+          "license": "MIT",
+          "selectionReason": "Modal and popover overlay specifications and focus traps"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/forms-advanced.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/forms-advanced.md",
+          "sha256": "e8e90f74e6424316e4e3041fc18b6560200b8d75686a3e6ee5ef51ea0cb9d178",
+          "sizeBytes": 4035,
+          "license": "MIT",
+          "selectionReason": "Form validation, error states, and live region announcements"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/data-display.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/data-display.md",
+          "sha256": "fc37d994fdb586e48922cea22b3a26b0c682824fe14a39081a1f32fdaf4ab430",
+          "sizeBytes": 4606,
+          "license": "MIT",
+          "selectionReason": "Data table, card, and list display specifications"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/data-viz.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/data-viz.md",
+          "sha256": "4f61d909c03964ed3f3de5d86c53c7596930a1db6c716a18d8b19bcddb412513",
+          "sizeBytes": 3809,
+          "license": "MIT",
+          "selectionReason": "Data visualization color tokens and accessibility contrast"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/feedback.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/feedback.md",
+          "sha256": "0bc4616ced544bb725d463936391cc70e5ada6d69b1a6bbf69d63aeac76b6088",
+          "sizeBytes": 3952,
+          "license": "MIT",
+          "selectionReason": "Toast, alert, and banner feedback notification states"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/navigation.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/navigation.md",
+          "sha256": "4a300ea00e7501decd995288b143e1403b05692f78b90cab005057235e57b302",
+          "sizeBytes": 4061,
+          "license": "MIT",
+          "selectionReason": "Breadcrumb, tab, and navigation bar accessibility patterns"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/icon-system.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/icon-system.md",
+          "sha256": "77554361d2e863dbf01f86cb4edb5cf7572e2b69e4dcc2bab1dcd0eda65211cf",
+          "sizeBytes": 3263,
+          "license": "MIT",
+          "selectionReason": "SVG icon scaling, viewBox standards, and aria-hidden rules"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/components/templates.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/components/templates.md",
+          "sha256": "f6eb2f97db99ea4e6d1423bcc2d5dd766420db1440d09dad67cd2cca2f624c5e",
+          "sizeBytes": 14124,
+          "license": "MIT",
+          "selectionReason": "Page template layouts and responsive grid definitions"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/accessibility/aria-patterns.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/accessibility/aria-patterns.md",
+          "sha256": "6009ecc236d4f03920c9d5dab8eea0051b354beaaac2f95da9dd146f57886a3b",
+          "sizeBytes": 17553,
+          "license": "MIT",
+          "selectionReason": "WAI-ARIA 1.2 authoring patterns and role matrix"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/accessibility/wcag-checklist.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/accessibility/wcag-checklist.md",
+          "sha256": "ac405c74b46ce2d37e96eada8e5a17affdb2b7e821a87df079de5cd14ebbf4af",
+          "sizeBytes": 13162,
+          "license": "MIT",
+          "selectionReason": "WCAG 2.2 AA audit checklist and pass/fail criteria"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/accessibility/wcag-aaa.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/accessibility/wcag-aaa.md",
+          "sha256": "1b77b80ceb767cb2d96855bb4ab192ff4c234c0ce4b0a90eb06a39dfae11d97f",
+          "sizeBytes": 3400,
+          "license": "MIT",
+          "selectionReason": "WCAG 2.2 AAA enhanced criteria reference"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/accessibility/vision.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/accessibility/vision.md",
+          "sha256": "0e679192a547f96642c02da2c387649453b40a0d2ad4e6c77b190fe376e2e962",
+          "sizeBytes": 3291,
+          "license": "MIT",
+          "selectionReason": "Visual impairment contrast and colorblindness adaptations"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/accessibility/cognitive.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/accessibility/cognitive.md",
+          "sha256": "4325daa6013bb5e948e13812e6c0692e07cb594ffadf135306d06c96a5c9b985",
+          "sizeBytes": 3166,
+          "license": "MIT",
+          "selectionReason": "Cognitive accessibility and interaction simplicity rules"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/accessibility/i18n-rtl.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/accessibility/i18n-rtl.md",
+          "sha256": "9b9fdf8c5c032a19567d44cbca0977359fa40db724c2f20070807f43586dfde4",
+          "sizeBytes": 3229,
+          "license": "MIT",
+          "selectionReason": "RTL layout, bidirectional text, and locale formatting"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/colors.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/colors.json",
+          "sha256": "60850d6562b1d51b79170cfe776de44d1974b8c4734ab01e7ab9f25adfb44d18",
+          "sizeBytes": 14122,
+          "license": "MIT",
+          "selectionReason": "Color token taxonomy and light/dark theme scales"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/spacing.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/spacing.json",
+          "sha256": "714b2ad9375181d15b1557cfef9925e5ac86a4006fb98bf27e46b11f420c12fe",
+          "sizeBytes": 4628,
+          "license": "MIT",
+          "selectionReason": "Spacing scale and layout rhythm tokens"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/typography.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/typography.json",
+          "sha256": "ae6753fee9f4f799bbac32adf2db51698db9da59a76563f662d7f47fc0bc6ebd",
+          "sizeBytes": 7402,
+          "license": "MIT",
+          "selectionReason": "Typography scale, font stacks, and line heights"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/states.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/states.json",
+          "sha256": "d520aae35e5c669ce27b3c2cc8e377a402f51026f39bf48164906a9b94d8b9a7",
+          "sizeBytes": 1669,
+          "license": "MIT",
+          "selectionReason": "Interactive state style definitions and pseudo-classes"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/shadows.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/shadows.json",
+          "sha256": "6afbc9e66078db03364dcacb07178bb6e7d3ae216b0c046b7827278b952dc1dd",
+          "sizeBytes": 3725,
+          "license": "MIT",
+          "selectionReason": "Elevation and shadow token hierarchy"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/borders.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/borders.json",
+          "sha256": "777c75db7c599bb06a45be111659fc71945f87fbd746fcf148a4b8ded1fc47a1",
+          "sizeBytes": 3259,
+          "license": "MIT",
+          "selectionReason": "Border width, style, and radius tokens"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/motion.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/motion.json",
+          "sha256": "fbe70aa2af67430424329985f86bbe85563c42624cfeb57b57931fef944c9ef0",
+          "sizeBytes": 5535,
+          "license": "MIT",
+          "selectionReason": "Motion duration, easing curves, and reduced-motion tokens"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/theming.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/theming.json",
+          "sha256": "330047d8445c429b03fac457e783b24d57d4446a8bdceb0cc24ace525d16fd86",
+          "sizeBytes": 1734,
+          "license": "MIT",
+          "selectionReason": "Theme switching and semantic alias mapping"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/breakpoints.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/breakpoints.json",
+          "sha256": "1cff39486b8f9706308d6ccfd1215d24d76f7a84ad0f2a2bb66ee68df6c83fca",
+          "sizeBytes": 3217,
+          "license": "MIT",
+          "selectionReason": "Responsive viewport breakpoints and media query tokens"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/sizing.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/sizing.json",
+          "sha256": "6abda02c3117c2092f0ee4efd6a6cb2ec1af3f7821c3a38ba6b33b0b4875ff53",
+          "sizeBytes": 2130,
+          "license": "MIT",
+          "selectionReason": "Control sizing scales and minimum touch target tokens"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/blur.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/blur.json",
+          "sha256": "b843e7d1d99d16ef80edcc74f6c305c88e1b0320a7b985aa08d37776a1a1d95a",
+          "sizeBytes": 857,
+          "license": "MIT",
+          "selectionReason": "Backdrop blur and glassmorphism tokens"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/opacity.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/opacity.json",
+          "sha256": "88b645196740ebf1360def96ba89929f5847d1e32847fd6a5c19d7708330a5c1",
+          "sizeBytes": 1195,
+          "license": "MIT",
+          "selectionReason": "Surface and state opacity tokens"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/data-viz.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/data-viz.json",
+          "sha256": "9690b313b640289a7691a8ac2d6e91731a49da30922a8eaa2f152e379830007d",
+          "sizeBytes": 3444,
+          "license": "MIT",
+          "selectionReason": "Accessible chart color palettes and contrast pairs"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/tokens/gradients.json",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/tokens/gradients.json",
+          "sha256": "d33460034bd92366b981dd38f9d608ed806fdc25cc9e3b16f8024d928c289fd1",
+          "sizeBytes": 1959,
+          "license": "MIT",
+          "selectionReason": "Gradient tokens and direction definitions"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/frameworks/adapter-protocol.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/frameworks/adapter-protocol.md",
+          "sha256": "2156284cca93ff7480c6d60e4f7540a915132826aeaab294b79cafc8036561e5",
+          "sizeBytes": 4243,
+          "license": "MIT",
+          "selectionReason": "Framework adapter interface and state mapping protocol"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/frameworks/nextjs.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/frameworks/nextjs.md",
+          "sha256": "577534fae1bcbe674082385a1c7a31943c3dc1087bb1553c3fd6f09c8e46173c",
+          "sizeBytes": 8606,
+          "license": "MIT",
+          "selectionReason": "Next.js App Router and Pages Router component conventions"
+        },
+        {
+          "originalRelativePath": "ux-ui-agent-skills-main/frameworks/react-tailwind.md",
+          "snapshotPath": "references/upstream/ux-ui-agent-skills-main/frameworks/react-tailwind.md",
+          "sha256": "4c2619ea956213062f598a3d7b158ef3d48ca14f87d4c2084649b1f3304883e4",
+          "sizeBytes": 12772,
+          "license": "MIT",
+          "selectionReason": "React and Tailwind CSS integration patterns"
+        }
+      ]
+    }
+  }
+}

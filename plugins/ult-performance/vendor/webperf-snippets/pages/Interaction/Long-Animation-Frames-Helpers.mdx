@@ -1,0 +1,87 @@
+import snippet from '../../snippets/Interaction/Long-Animation-Frames-Helpers.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# LoAF Helpers
+
+Advanced debugging utilities for [Long Animation Frames](/Interaction/Long-Animation-Frames). While the basic LoAF snippet shows real-time frame data, this helper library provides powerful analysis, filtering, and export capabilities.
+
+**When to use each:**
+
+| Snippet | Best for | Output |
+|---------|----------|--------|
+| [Long Animation Frames](/Interaction/Long-Animation-Frames) | Real-time debugging, seeing frames as they happen | Live console logs |
+| **LoAF Helpers** | Post-session analysis, finding patterns, exporting data | On-demand reports |
+
+**Available functions:**
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `summary()` | Overview of all captured frames with severity breakdown | `loafHelpers.summary()` |
+| `topScripts(n)` | Top N slowest scripts across all frames | `loafHelpers.topScripts(5)` |
+| `filter(options)` | Filter frames by min/max duration | `loafHelpers.filter({ minDuration: 150 })` |
+| `findByURL(search)` | Find frames containing scripts matching URL | `loafHelpers.findByURL('analytics')` |
+| `percentiles(pcts)` | Calculate P50, P75, P95, P99 for RUM reporting | `loafHelpers.percentiles()` |
+| `exportJSON()` | Download all data as JSON file | `loafHelpers.exportJSON()` |
+| `exportCSV()` | Download all data as CSV file | `loafHelpers.exportCSV()` |
+| `getRawData()` | Get raw frame array for custom analysis | `loafHelpers.getRawData()` |
+| `clear()` | Clear all captured data | `loafHelpers.clear()` |
+| `help()` | Show available commands | `loafHelpers.help()` |
+
+**Severity thresholds:**
+
+| Severity | Duration | Indicator |
+|----------|----------|-----------|
+| Critical | > 200ms | 🔴 |
+| High | 150-200ms | 🟠 |
+| Medium | 100-150ms | 🟡 |
+| Low | < 100ms | 🟢 |
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Output
+
+**summary()** shows:
+- Total frames captured and their durations
+- Blocking time (time > 50ms)
+- Severity breakdown with color indicators
+
+**topScripts(n)** aggregates scripts by source and shows:
+- Total time spent in each script
+- Number of times it appeared in LoAFs
+- Maximum single execution time
+- Forced style/layout time (layout thrashing)
+
+**percentiles()** calculates:
+
+| Percentile | Meaning | Use for |
+|------------|---------|---------|
+| P50 | Median - 50% are faster | Typical experience |
+| P75 | 75% are faster | General performance target |
+| P95 | 95% are faster | Tail latency |
+| P99 | 99% are faster | Worst-case scenarios |
+
+### RUM Integration Example
+
+```js copy
+// After user session, collect metrics
+const metrics = loafHelpers.percentiles([50, 75, 95, 99]);
+const summary = loafHelpers.getRawData();
+
+// Send to your analytics
+analytics.track("loaf_performance", {
+  session_frames: summary.length,
+  p50_duration: metrics.p50,
+  p75_duration: metrics.p75,
+  p95_duration: metrics.p95,
+  p99_duration: metrics.p99,
+  total_blocking: summary.reduce((sum, f) => sum + f.blockingDuration, 0),
+});
+```
+
+### Further Reading
+
+- [Long Animation Frames API](https://developer.chrome.com/docs/web-platform/long-animation-frames) | Chrome Developers
+- [Optimize long tasks](https://web.dev/articles/optimize-long-tasks) | web.dev
+- [Real User Monitoring](https://web.dev/articles/vitals-measurement-getting-started) | web.dev

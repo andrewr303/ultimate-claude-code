@@ -1,0 +1,9 @@
+.env
+.DS_Store
+beta
+node_modules
+.next
+.vercel
+reports
+workspace
+public/sitemap-*.xml

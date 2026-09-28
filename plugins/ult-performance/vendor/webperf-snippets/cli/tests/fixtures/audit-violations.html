@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Violations — Deliberate Issues</title>
+  <!-- VIOLATION render-blocking: external CSS in <head> without preload -->
+  <link rel="stylesheet" href="/blocking.css">
+</head>
+<body>
+  <!-- VIOLATION lazy-atf: lazy image above the fold -->
+  <img src="/lazy-atf.gif" loading="lazy" width="300" height="200" alt="lazy above fold">
+
+  <!-- VIOLATION lazy-conflict: lazy + fetchpriority=high on the same element -->
+  <img src="/conflict.gif" loading="lazy" fetchpriority="high" width="200" height="150" alt="lazy conflict">
+
+  <!-- VIOLATION eager-below-fold: images below viewport without lazy loading -->
+  <!-- min 100x100 so the snippet does not exclude them as tracking pixels (<50px) -->
+  <div style="margin-top: 2000px;">
+    <img src="/eager1.gif" width="100" height="100" alt="eager below fold 1">
+    <img src="/eager2.gif" width="100" height="100" alt="eager below fold 2">
+  </div>
+</body>
+</html>

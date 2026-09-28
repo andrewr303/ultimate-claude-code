@@ -1,0 +1,63 @@
+import snippet from '../../snippets/Interaction/Input-Latency-Breakdown.js?raw'
+import { Snippet } from '../../components/Snippet'
+
+# Input Latency Breakdown
+
+### Overview
+
+Aggregates interaction latency by event type to reveal which phase causes slowness across all interactions with the page. While [Interactions](/Interaction/Interactions) shows a per-interaction breakdown in real time, this snippet collects data over time and answers a different question: **is click systematically slower than keypress? Is the bottleneck always input delay, or does it vary by event?**
+
+**Why this matters:**
+
+INP measures the worst interaction, but understanding the pattern across many interactions is more actionable. A click with high input delay has a different fix than a keypress with slow processing time. Grouping by event type surfaces systematic problems instead of outliers.
+
+**The three phases of every interaction:**
+
+| Phase | What it measures | Common causes |
+|-------|-----------------|---------------|
+| **Input Delay** | Time from user input to event handler start | Long tasks blocking the main thread |
+| **Processing Time** | Event handler execution | Slow JavaScript, complex handlers |
+| **Presentation Delay** | Rendering after processing completes | Large DOM updates, layout thrashing |
+
+> **How to use:** Run the snippet, interact with the page, then call `getInputLatencyBreakdown()` to see aggregated stats grouped by event type.
+
+### Snippet
+
+<Snippet code={snippet} />
+
+### Understanding the Results
+
+Each event type prints a single line with its P75 values across all three phases, followed by a distribution bar:
+
+```
+🟡 click (12 interactions)  P75: 280ms   Input Delay: 45ms  Processing: 28ms  Presentation: 207ms
+   ██████▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░
+   █ Input Delay (16%)  ▓ Processing (10%)  ░ Presentation (74%)
+   ⚠️ Bottleneck: Presentation — reduce DOM changes or avoid layout thrashing after the handler
+```
+
+All values are **P75** — the same percentile INP uses — so they reflect typical behavior rather than outliers.
+
+**Bottleneck identification:**
+
+| Bottleneck | Likely cause | Fix |
+|-----------|-------------|-----|
+| **Input Delay** | Long tasks run before the event | `scheduler.yield()`, task splitting |
+| **Processing** | Slow event handlers | Optimize handlers, debounce rapid events |
+| **Presentation** | Expensive render after handler | Reduce DOM changes, avoid layout thrashing |
+
+### How this differs from Interactions
+
+| Snippet | Focus |
+|---------|-------|
+| [Interactions](/Interaction/Interactions) | Per-interaction breakdown, real-time, with optimization hints per event |
+| **Input Latency Breakdown** | P75 by event type, reveals systematic patterns across many interactions |
+
+Use both together: `Interactions` to catch individual slow events as they happen, and `getInputLatencyBreakdown()` after several interactions to identify which event type is systematically problematic.
+
+### Further Reading
+
+- [Interaction to Next Paint (INP)](https://web.dev/articles/inp) | web.dev
+- [Optimize INP](https://web.dev/articles/optimize-inp) | web.dev
+- [Find slow interactions in the field](https://web.dev/articles/find-slow-interactions-in-the-field) | web.dev
+- [scheduler.yield()](https://developer.mozilla.org/en-US/docs/Web/API/Scheduler/yield) | MDN
