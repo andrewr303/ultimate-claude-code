@@ -97,14 +97,14 @@ Every plugin has a default skill that routes a plain-language request to the rig
 |---|---:|
 | [`dist/ult-engineer.plugin`](dist/ult-engineer.plugin) | 0.7 MB |
 | [`dist/ult-performance.plugin`](dist/ult-performance.plugin) | 1.7 MB |
-| [`dist/ult-accessability.plugin`](dist/ult-accessability.plugin) | 8.4 MB |
+| [`dist/ult-accessability.plugin`](dist/ult-accessability.plugin) | 4.7 MB |
 | [`dist/ultimate-sdd.plugin`](dist/ultimate-sdd.plugin) | 0.3 MB |
-| [`dist/ui-component-expert.plugin`](dist/ui-component-expert.plugin) | 0.8 MB |
+| [`dist/ui-component-expert.plugin`](dist/ui-component-expert.plugin) | 0.6 MB |
 
 ### In Claude Code (local folder)
 
 ```bash
-git clone <this-repo-url> ultimate-claude-code
+git clone https://github.com/andrewr303/ultimate-claude-code.git
 claude --plugin-dir ./ultimate-claude-code/plugins/ult-engineer
 ```
 
@@ -155,7 +155,7 @@ What it enforces, each learned from a real upload rejection:
 | LF line endings and the executable bit on shell scripts | CRLF breaks hooks on Linux. |
 | No `node_modules`, caches, nested archives or other-platform manifests | Keeps the upload small and valid. |
 
-The source folders are unchanged copies of the working plugins, apart from removing `node_modules`, caches, and the redundant `.zip` copies of vendored folders under `ult-accessability`.
+The source folders are unchanged copies of the working plugins, apart from removing `node_modules`, caches, the redundant `.zip` copies of vendored folders under `ult-accessability`, a duplicated nested vendor copy and stray scratch files in `ult-accessability`.
 
 ---
 
