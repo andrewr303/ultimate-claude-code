@@ -32,7 +32,7 @@ When passed a parent directory (e.g. `<target>/.ui-component-expert/runs`), `ing
 ## Security Invariants and Path Validation
 
 ### 1. Windows Path Normalization & Boundary Enforcement
-- Accepts absolute drive-letter paths (e.g. `C:/Users/Andrew/Downloads/export.zip` or `C:\Users\Andrew\Downloads\export.zip`) and relative paths.
+- Accepts absolute drive-letter paths (e.g. `C:/Users/<Username>/Downloads/export.zip` or `C:\Users\<Username>\Downloads\export.zip`) and relative paths.
 - Internally normalizes all backslashes (`\`) to POSIX forward slashes (`/`).
 - **Strictly rejects Universal Naming Convention (UNC) paths** (e.g. `\\server\share\file` or `//server/share/file`) to prevent remote resource access.
 - **Strictly blocks path traversal sequences** (`../` or `..\`). Canonicalized paths must resolve strictly within the designated input or workspace boundary.

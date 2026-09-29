@@ -33,6 +33,6 @@ WCAG 2.2 Level AA and AAA engineering guides (`wcag-22-aa/SKILL.md`, `wcag-22-aa
 ## ult-performance accessibility skill
 
 MIT. Upstream MIT code from Addy Osmani (web-quality-skills) and guidance per the ult-performance LICENSE.
-Reference only: `C:/Users/Andrew/.andrewcode/plugins/managed/ult-performance/skills/accessibility/` (read-only, never copied verbatim)
+Reference only: the sibling `ult-performance` plugin's `skills/accessibility/` (read-only, never copied verbatim)
 
 WCAG 2.2 quick checks, `references/WCAG.md`, and `references/A11Y-PATTERNS.md` structure. Adapted into this plugin's `references/` layout and the `fix` / `testing` skill split.

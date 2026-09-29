@@ -3,3 +3,10 @@ node_modules/
 __pycache__/
 .DS_Store
 *.log
+Thumbs.db
+*.tmp
+*.bak
+.env
+.env.*
+.vscode/
+.idea/
