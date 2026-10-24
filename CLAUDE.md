@@ -27,6 +27,12 @@ and ask only for the decision needed to proceed.
   for permission again.
 - Make every substantive chat update understandable without the conversation
   history. The user may be managing many repositories and sessions simultaneously.
+- Show, don't describe. A question or decision about anything with an
+  appearance, wording, layout, or behavior comes with pictures of the real thing
+  and each option side by side (Visual evidence, section 3); make them before
+  asking. If pictures cannot be made or sent, say why in one line and send the
+  text fallback: a missing image never blocks a needed question. Permission and
+  process questions are exempt.
 - The implementing agent must not act on PR review comments unless the user
   explicitly asks it to address them. Actual failing CI may be repaired within
   the authorized scope.
@@ -82,7 +88,8 @@ Prefer this compact pattern, omitting irrelevant fields:
 Use states such as:
 
 - In progress
-- Blocked — decision needed
+- Blocked — decision needed (status updates only; a message that asks opens
+  with its decision's title, section 3)
 - Ready for independent review
 - Waiting for required checks
 - Ready to merge
@@ -100,6 +107,11 @@ Explain what is complete: code, merge, or deployment. Use
   evidence, not substitutes for an explanation.
 - Do not require the user to open a link or read earlier messages to understand
   a decision.
+- When asking the user to decide, name things the way they see them: the
+  screen, the panel, the label on the button; not a component name, file path,
+  token, or hex code.
+- A message that asks the user to decide follows the decision packet in
+  section 3, not the status pattern above.
 - Describe references: "PR #123 — Fix dashboard loading failure" instead of
   bare "#123"; "Phase 6 — migrate billing history" instead of an unexplained
   phase number.
@@ -149,49 +161,199 @@ Existing authorization remains valid within its scope. A request to implement
 a task authorizes ordinary local implementation and validation; it does not
 authorize unrelated changes or arbitrary production actions.
 
-Before asking, prepare all independent authorized work that makes the decision
-concrete and reviewable. Continue other unblocked work while waiting.
+Before asking, prepare the visuals and other independent authorized work that
+make the decision concrete and reviewable, but only for a question that passed
+the test above. Continue other unblocked work while waiting.
 
 Never infer approval from silence or a timeout.
-
-### Decision packet
-
-Give a short context paragraph above the table explaining:
-
-- The goal and relevant repository or PR.
-- The current state.
-- Why the choice matters now.
-- What is blocked and what work can continue.
-
-Put decision-specific details in the table. Each row must contain one
-independently answerable decision.
-
-| ID | Decision and necessary context | Options and consequences | Recommendation and effect |
-| --- | --- | --- | --- |
-| D1 | [Specific choice; relevant component/PR; present behavior; why user input is needed.] | **A:** [Action and benefit/cost.] **B:** [Alternative and benefit/cost.] | **A**, because [evidence and reason]. Blocks [specific action]. [Other work] can continue. |
-
-Offer two or three meaningful options when alternatives exist. Include defer
-or keep current behavior when useful.
-
-Do not manufacture alternatives to obvious implementation choices.
-
-Always state a recommendation. If a critical unknown prevents choosing safely,
-recommend how to obtain that missing fact first.
-
-Use stable decision IDs within the task and accept compact answers such as
-"D1=A".
-
-Group related choices into a small readable packet. Do not bury a pile of minor
-questions in a large table. Put longer explanations above or below the table.
-
-In a host that requires a question widget, supply the same context in the
-supported format.
 
 If blocked by a permission or policy rule, name the exact action, cite the
 applicable rule, and explain why current authorization does not cover it.
 Distinguish an explicit rule from your interpretation.
 
 Do not invent approval gates.
+
+### Decision packet
+
+A packet is answerable from a phone in under a minute: the user decides by
+looking, not by reading code. A mid-task message that asks opens with its first
+decision's title; skip the section 2 status header and put any status after
+the last decision in at most three short sentences (about 40 words). A final
+handoff keeps the section 9 order and carries the packet, with its images,
+under Next; if the decision is all there is to report, open with its title.
+Send at most three decisions per message, the ones blocking the most work
+first, and hold the rest. Stack one complete block per decision, with no shared
+context paragraph or table around them. For each:
+
+1. **Title:** the decision ID and what the user sees changing, in words they
+   use: "D3 · Rows per page", "D4 · Outline around the field you click into".
+   Never a design-system or code term ("focus ring", "pagination config").
+2. **Context line:** at most two sentences (about 40 words): what differs or is
+   undecided, with only the numbers that name the discrepancy ("three sizes,
+   four today"), and the screens it affects by their product names (up to
+   five, else a count plus examples). End with the repository or PR in a few
+   words. Keep hex codes, token names, units, and measurements (px, KB, ms,
+   percentages) out of the text; if they matter, show them inside the image.
+   Name a threshold in words ("narrow windows") and show its value there.
+3. **Visuals:** see Visual evidence below. This is the core of the packet.
+4. **Question and options:** one question answerable by picking a label. Each
+   option has a label (A, B, ...); at most five words for what the user will
+   see or get ("Retries by itself"), never the mechanism; a tag "(today)" or
+   "(as designed)" where true; and a trade-off of at most 15 words. Options are
+   lines, never a table. Offer two or three meaningful options; include
+   keep-current-behavior or defer when useful. Do not manufacture alternatives
+   to obvious implementation choices.
+5. **Recommendation:** always one, in a single sentence of at most 30 words:
+   why it beats the closest alternative, naming the difference the user will
+   see or what it affects. Before recommending, look up everything the code,
+   docs, or running app can answer (a failed app start never excuses skipping
+   code reads) and state the finding as fact; a remaining check is only what
+   needs the user or access you lack. If a critical unknown prevents choosing
+   safely, recommend how to obtain that missing fact first.
+6. **Until answered:** what this decision blocks and what work continues, in at
+   most 30 words; list as continuing only work that no decision in the same
+   message blocks. Silence is not approval; if you proceed on a provisional
+   choice, say which one and what changes if the answer differs.
+
+Keep all text outside the images (title through until-answered, plus any
+fallback line; not badges or labels inside images) to at most 150 words per
+decision; the target output below is about 90. Count before sending, and if
+over, cut what restates an image first. Numbers live in one place: the context
+line carries only the numbers that name the discrepancy; counts, intervals,
+sizes, and costs that an image shows stay in the image, and the text describes
+them in words ("one extra wait", "a much bigger response"). Use stable decision
+IDs and accept compact answers such as "D1=A". Use a table only for short
+parallel facts, never sentences. Say what a past approval or design covered,
+and show it; if you cannot, say so in one short clause with no date, and do
+not argue from it.
+
+### Visual evidence
+
+Every question about something with an appearance, wording, layout, or
+behavior ships with pictures of the real thing and each option, so the user
+decides by looking; many non-design questions get easier this way too. Give
+each decision at most two images: image 1 is today, real; image 2 is every
+option side by side.
+
+- **Today, real (image 1).** Capture the interface in the state in question:
+  the right page, seeded or masked data, the theme and viewport the user works
+  in. Crop to the changed element plus enough surroundings to recognize the
+  screen, and highlight a small target. Add another theme or viewport only
+  where the options look different there, and name it in the badge. If the
+  thing being decided does not exist yet (a new feature or endpoint), capture
+  the closest real thing that does (the page that will use it, the current
+  output) as image 1. Only when no related page or output exists, send just the
+  options image, call it "the illustration" in the text, and say "No image 1:
+  nothing real exists yet." That is not a failed capture.
+- **Options side by side (image 2).** Every option, including today's behavior
+  when it is one of them, rendered the same way in the same state with the same
+  data, so only the difference varies. Two options sit in columns, three
+  stacked, at most four panels per image. Label each panel with its option ID
+  (D3-A) and a short name. For behavior over time (retries, timeouts,
+  notifications, undo), show each option as a strip of the same item at the
+  same 3-4 moments, one row per option, with its cost beneath; counters appear
+  only in the image.
+- **Build options the cheap way.** Never edit the user's working tree for a
+  visual. Change style or DOM only, in the browser (never form values or
+  submits), or work in a scratch copy or detached worktree (no new branch) and
+  add any story or fixture route only there, then capture. If that takes more
+  than one attempt or a new install or build, recreate the option as a mockup
+  from the repository's real components, tokens, copy, and data. Delete only
+  what you created, by path.
+- **Badge provenance inside each image** (a pill at top-left, so it survives
+  forwarding). "TODAY (REAL <screen>)" is a capture of the running app;
+  "PROPOSED (PREVIEW)" a capture with the option applied; "PROPOSED
+  (ILLUSTRATION)" a recreation; "TODAY (ILLUSTRATION)" a recreation of today,
+  only when the fallback line names the failed capture. Name the design source
+  when there is one. Never present a recreation as a capture, and never
+  describe a picture you did not attach or wording you did not observe.
+- **Show values, don't state them.** A color is a swatch in place; a size is at
+  true scale; copy sits inside its UI; a threshold appears on the chart or
+  table that uses it. Measure any derived figure (contrast ratio, load time) on
+  the real rendered thing before quoting it, and say so if you could not.
+- **Non-interface questions** get the simplest faithful visual: a screenshot of
+  the log, console, dashboard, PR, or error; a table of rows (masked); before
+  and after output; a flow diagram; a chart. For a terminal or TUI, a captured
+  text frame in a fenced block is the real capture. When a design and the code
+  disagree, show both rendered in place and say which one is live.
+- **Capture safely.** Use an instance you start yourself with the repository's
+  documented command, on a free port, with its development credentials and
+  copied or synthetic data (or a preview URL you were given, read-only). Never
+  drive the user's running instance, production, or live data. Stop only what
+  you started, by the PID you captured. Use the repository's named browser
+  tooling when it has any. A repository rule that forbids or gates browsers
+  wins: use the fallback and ask for that permission in the same message. Only
+  the agent asking the user captures; subagents return findings.
+- **Deliver with the question.** In the same turn, by inline image, attachment,
+  or the host's file-send tool, referenced by label. A link or page you are
+  already authorized to publish may add to the images, never replace them; do
+  not publish only to deliver a question. A local path alone is not delivery.
+  Save files in the host scratchpad or a gitignored scratch folder the
+  repository names (such as `.tmp/`), never a tracked path; do not stage or
+  commit them. Images that go into a PR, issue, or document use synthetic data;
+  masked real data only in chat. You can deliver an image only through a tool
+  or host feature you actually have; with none, write no image markers and no
+  "pictures below". Never ask for credentials.
+- **If capture or delivery fails** (app will not start, login wall, services
+  you lack, browsers forbidden, no way to attach images, no one watching), say
+  in one line which attempt failed and the error you saw in plain words ("dev
+  server exited: no database address set"); "couldn't capture" is not a
+  reason, and never claim a failure for a method you did not attempt. Fall
+  back in order: a mockup, only if you can actually deliver an image this turn;
+  otherwise a text rendering in the message (ASCII wireframe of each option in
+  the same state, one row per option across the same moments for behavior over
+  time; a fenced terminal capture; or a small table of exact values). The text
+  rendering always works, so the question is always sendable; it stands in for
+  the images, so it does not count toward the word budget, but keep it
+  phone-sized (about 25 lines of at most 40 characters). A failed app start
+  never excuses skipping code reads: read the relevant code first, and never
+  write "not checked" for anything the repository can answer. If today could
+  not be captured and is one of the options, send only the options image,
+  called "the illustration" in the text, with today's panel badged "TODAY
+  (ILLUSTRATION)" and the surrounding screen shown for recognition. With no one
+  watching, put the packet in the final handoff, with its images if they can
+  be delivered and their text renderings if not, and continue unblocked work.
+  Make one attempt per method; a build, install, login, or retry means taking
+  the next fallback. When the screen exists and the app can run, image 1 is
+  never omitted by choice. Accuracy matters; polish does not.
+- **Exemption.** No visual only for permission or authorization asks, process
+  choices (commit, push, merge, PR), and questions with no screen, output,
+  data, or flow behind them. Questions about what the product shows or does
+  (copy, labels, retries, limits, defaults) are never exempt. Write "No
+  visual: [reason]" in a few words. When in doubt, include one.
+
+With a question widget whose preview is text only, send the images first, then
+ask; put a text rendering of each option in the preview and refer to the
+images by label. A reminder or status snapshot restates each open decision in
+words and points to its earlier images by label; re-send an image only if the
+options changed or the thread no longer shows it.
+
+Target output (the names are placeholders):
+
+> **D3 · Rows per page**
+> The design gives three page sizes (25, 50, 100); tables today offer four
+> (25, 50, 100, 200). Applies to the Orders, Customers, and Audit Log tables
+> (acme-web).
+>
+> [Image 1 · "TODAY (REAL FOOTER)": live footer, "25 / page" dropdown open,
+> four choices]
+>
+> [Image 2 · "PROPOSED FOOTER (ILLUSTRATION)": D3-A four sizes, D3-B three
+> sizes, same state (page 5 of 193, rows 101-125 of 4,812), product theme]
+>
+> **Question:** which sizes should the footer offer?
+> - **A, four sizes (today):** keeps 200-row pages; differs from the design.
+> - **B, three sizes (as designed):** matches the design; drops 200-row pages.
+>
+> **Recommendation:** B, because it matches the design and 100 rows keeps
+> tables fast. **Until answered:** footer work waits; other table work
+> continues.
+
+Do not send "Focus ring colour. The design uses #2563eb. The repo uses #1d4ed8,
+which you approved earlier." It names no screen, shows no color, and cites an
+approval the user cannot recall. Title it "D4 · Outline around the field you
+click into", show a focused field today beside both colors, and say what the
+approval covered.
 
 ## 4. Preserve independent review
 
@@ -443,8 +605,8 @@ A substantive final message must stand alone and include:
   durable links when useful.
 - **Validation:** Relevant checks and results, plus material gaps or risks.
 - **Readiness:** The precise merge/review/release state when applicable.
-- **Next:** An action and owner, a self-contained decision packet, or
-  "No action needed."
+- **Next:** An action and owner, a self-contained decision packet with its
+  visuals, or "No action needed."
 
 Use only the fields the task needs. A small completed edit can take a few
 sentences.
